@@ -1,0 +1,134 @@
+{
+  "project": {
+    "name": "Green Apartment Building for Uzbekistan",
+    "course": "Circular Economy ECON330",
+    "type": "Design Charrette - Homework Assignment 2",
+    "location": "Regional cities of Uzbekistan (Bukhara, Samarkand, Namangan, etc.)",
+    "climate": "Continental - Hot dry summers (40°C+), cold winters (-15°C)"
+  },
+  "building": {
+    "type": "U-shaped apartment building with central courtyard",
+    "floors": 4,
+    "total_units": 48,
+    "entrances": 3,
+    "dimensions": {
+      "width_m": 36,
+      "depth_m": 14,
+      "floor_height_m": 3.0,
+      "total_height_m": 12.0,
+      "gross_floor_area_m2": 2016,
+      "courtyard_m2": 96
+    },
+    "apartment_sizes": {
+      "1_room_m2": "30-35",
+      "2_room_m2": "45-55",
+      "3_room_m2": "60-75"
+    }
+  },
+  "construction": {
+    "structure": "Reinforced concrete frame (seismic-resistant)",
+    "walls": "380mm fired clay brick + 120mm mineral wool",
+    "total_wall_thickness_mm": 500,
+    "roof": "Flat RC slab + waterproofing + 200mm insulation + green roof layers",
+    "exterior_finish": "Light-colored cementitious plaster (cream/beige)",
+    "courtyard_paving": "Local stone / permeable pavers"
+  },
+  "energy_efficiency": {
+    "wall_R_value": "R-3.5 m²·K/W",
+    "roof_R_value": "R-5.0 m²·K/W",
+    "window_U_value": "1.1 W/m²·K",
+    "window_type": "Double-glazed Low-E argon-filled",
+    "window_to_wall_ratio": "22%",
+    "window_recess_mm": 300,
+    "ventilation": "Cross-ventilation + stack effect via stairwell",
+    "shading": {
+      "south": "Horizontal louvers (600-800mm projection)",
+      "east_west": "Vertical fins / perforated screens (panjara-inspired)",
+      "balconies": "South-facing overhangs providing shade"
+    }
+  },
+  "renewable_energy": {
+    "solar_PV": {
+      "capacity_kW": 30,
+      "panel_area_m2": 150,
+      "annual_output_kWh": 45000,
+      "CO2_reduction_tonnes_year": 22,
+      "payback_years": "6-8"
+    },
+    "solar_hot_water": {
+      "type": "Evacuated tube collectors",
+      "coverage": "60% of domestic hot water demand"
+    }
+  },
+  "water_systems": {
+    "rainwater_harvesting": {
+      "cistern_volume_L": 15000,
+      "annual_capture_L": 85000,
+      "uses": [
+        "Toilet flushing",
+        "Landscape irrigation"
+      ]
+    },
+    "greywater_recycling": {
+      "sources": [
+        "Sinks",
+        "Showers"
+      ],
+      "treatment": "Biofilter system",
+      "reuse": "Landscape irrigation",
+      "water_savings_percent": 35
+    }
+  },
+  "green_roof": {
+    "type": "Extensive (sedum/drought-resistant plants)",
+    "area_m2": 200,
+    "substrate_depth_mm": 100,
+    "benefits": [
+      "3-5°C cooling effect",
+      "60-70% stormwater retention",
+      "R-2.5 additional insulation",
+      "Extended roof lifespan (2×)",
+      "Urban heat island reduction"
+    ]
+  },
+  "landscaping": {
+    "courtyard": {
+      "trees": "4 deciduous shade trees",
+      "water_feature": "Recirculating fountain",
+      "community_gardens": "8 raised beds",
+      "seating": "Shaded benches"
+    },
+    "perimeter": {
+      "native_plants_percent": 85,
+      "fruit_trees": [
+        "Pomegranate",
+        "Apricot",
+        "Grape vines"
+      ],
+      "permeable_paving": "All walkways",
+      "bioswale_length_m": 25
+    }
+  },
+  "circular_economy_principles": [
+    "Local materials (fired brick, local stone) — minimizes transport emissions",
+    "Modular design — components can be disassembled and reused",
+    "Durable construction — 80+ year building lifespan",
+    "Rainwater & greywater recycling — closed water loop",
+    "Community gardens — local food production",
+    "Solar energy — renewable power generation",
+    "Green roof — biodiversity and microclimate benefits",
+    "Natural ventilation — reduces mechanical system dependence",
+    "Replicable design — can be reproduced across Uzbekistan's cities"
+  ],
+  "estimated_costs": {
+    "note": "Approximate costs in USD for Uzbekistan context",
+    "construction_per_m2_USD": "350-500",
+    "solar_PV_system_USD": "25,000-35,000",
+    "rainwater_system_USD": "5,000-8,000",
+    "green_roof_per_m2_USD": "30-50",
+    "total_estimated_USD": "800,000-1,200,000",
+    "annual_energy_savings_USD": "8,000-12,000",
+    "annual_water_savings_USD": "3,000-5,000",
+    "simple_payback_years": "8-12 (for green premium)"
+  }
+}

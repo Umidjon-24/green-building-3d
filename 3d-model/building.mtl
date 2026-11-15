@@ -1,0 +1,79 @@
+# Green Apartment Building Materials
+
+newmtl brick
+Kd 0.720 0.450 0.290
+Ka 0.144 0.090 0.058
+Ks 0.1 0.1 0.1
+Ns 10.0
+d 1.0
+
+newmtl concrete
+Kd 0.830 0.790 0.720
+Ka 0.166 0.158 0.144
+Ks 0.1 0.1 0.1
+Ns 10.0
+d 1.0
+
+newmtl window
+Kd 0.420 0.640 0.740
+Ka 0.084 0.128 0.148
+Ks 0.1 0.1 0.1
+Ns 10.0
+d 1.0
+
+newmtl solar_panel
+Kd 0.100 0.140 0.490
+Ka 0.020 0.028 0.098
+Ks 0.1 0.1 0.1
+Ns 10.0
+d 1.0
+
+newmtl green_roof
+Kd 0.330 0.550 0.180
+Ka 0.066 0.110 0.036
+Ks 0.1 0.1 0.1
+Ns 10.0
+d 1.0
+
+newmtl metal
+Kd 0.470 0.570 0.600
+Ka 0.094 0.114 0.120
+Ks 0.1 0.1 0.1
+Ns 10.0
+d 1.0
+
+newmtl wood
+Kd 0.490 0.350 0.250
+Ka 0.098 0.070 0.050
+Ks 0.1 0.1 0.1
+Ns 10.0
+d 1.0
+
+newmtl water
+Kd 0.310 0.760 0.970
+Ka 0.062 0.152 0.194
+Ks 0.1 0.1 0.1
+Ns 10.0
+d 1.0
+
+newmtl ground
+Kd 0.770 0.720 0.590
+Ka 0.154 0.144 0.118
+Ks 0.1 0.1 0.1
+Ns 10.0
+d 1.0
+
+newmtl tree_trunk
+Kd 0.360 0.300 0.250
+Ka 0.072 0.060 0.050
+Ks 0.1 0.1 0.1
+Ns 10.0
+d 1.0
+
+newmtl tree_canopy
+Kd 0.220 0.560 0.240
+Ka 0.044 0.112 0.048
+Ks 0.1 0.1 0.1
+Ns 10.0
+d 1.0
+

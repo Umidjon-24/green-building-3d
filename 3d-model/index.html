@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Green Apartment Building - Uzbekistan | 3D Model</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden; 
+            background: #1a1a2e; 
+        }
+        #canvas-container { 
+            width: 100vw; 
+            height: 100vh; 
+            position: relative; 
+        }
+        canvas { display: block; }
+        
+        /* Info Panel */
+        #info-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(16, 42, 67, 0.92);
+            backdrop-filter: blur(12px);
+            color: #e0e0e0;
+            padding: 24px;
+            border-radius: 16px;
+            max-width: 360px;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            z-index: 10;
+            transition: transform 0.3s ease;
+        }
+        #info-panel h1 {
+            font-size: 1.3em;
+            color: #4CAF50;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #info-panel .subtitle {
+            font-size: 0.82em;
+            color: #90CAF9;
+            margin-bottom: 14px;
+        }
+        #info-panel p {
+            font-size: 0.85em;
+            line-height: 1.55;
+            color: #b0bec5;
+        }
+        
+        /* Feature Labels */
+        #feature-panel {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            z-index: 10;
+        }
+        .feature-btn {
+            background: rgba(16, 42, 67, 0.88);
+            backdrop-filter: blur(8px);
+            color: #e0e0e0;
+            border: 1px solid rgba(76, 175, 80, 0.35);
+            padding: 10px 18px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.82em;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .feature-btn:hover, .feature-btn.active {
+            background: rgba(76, 175, 80, 0.25);
+            border-color: #4CAF50;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.2);
+        }
+        .feature-btn .icon { font-size: 1.1em; }
+        
+        /* Controls panel */
+        #controls-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(16, 42, 67, 0.88);
+            backdrop-filter: blur(12px);
+            padding: 18px;
+            border-radius: 14px;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+            color: #b0bec5;
+            font-size: 0.8em;
+            z-index: 10;
+        }
+        #controls-panel h3 {
+            color: #81C784;
+            margin-bottom: 10px;
+            font-size: 1em;
+        }
+        #controls-panel div { margin: 5px 0; }
+        #controls-panel kbd {
+            background: rgba(255,255,255,0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        
+        /* Feature detail popup */
+        #feature-detail {
+            position: absolute;
+            top: 50%;
+            right: 30px;
+            transform: translateY(-50%);
+            background: rgba(16, 42, 67, 0.95);
+            backdrop-filter: blur(12px);
+            color: #e0e0e0;
+            padding: 24px;
+            border-radius: 16px;
+            max-width: 320px;
+            border: 1px solid rgba(76, 175, 80, 0.4);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            z-index: 20;
+            display: none;
+        }
+        #feature-detail h3 {
+            color: #4CAF50;
+            margin-bottom: 8px;
+            font-size: 1.15em;
+        }
+        #feature-detail p {
+            font-size: 0.85em;
+            line-height: 1.6;
+            color: #b0bec5;
+        }
+        #feature-detail .stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        #feature-detail .stat-label { color: #90CAF9; }
+        #feature-detail .stat-value { color: #81C784; font-weight: 600; }
+        #feature-detail .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 14px;
+            cursor: pointer;
+            color: #90CAF9;
+            font-size: 1.2em;
+        }
+
+        /* Day/Night Toggle */
+        #time-toggle {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            display: flex;
+            gap: 4px;
+            background: rgba(16, 42, 67, 0.88);
+            padding: 5px;
+            border-radius: 25px;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+        .time-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.85em;
+            background: transparent;
+            color: #b0bec5;
+            transition: all 0.3s;
+        }
+        .time-btn.active {
+            background: rgba(76, 175, 80, 0.3);
+            color: #fff;
+        }
+
+        /* Loading screen */
+        #loading {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: #1a1a2e;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: opacity 0.8s;
+        }
+        #loading h2 { color: #4CAF50; margin-bottom: 20px; }
+        .loader {
+            width: 50px; height: 50px;
+            border: 3px solid rgba(76,175,80,0.2);
+            border-top-color: #4CAF50;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading">
+        <h2>🏗️ Building Green Future...</h2>
+        <div class="loader"></div>
+    </div>
+
+    <div id="canvas-container">
+        <!-- Info Panel -->
+        <div id="info-panel">
+            <h1>🌿 Green Apartment Building</h1>
+            <div class="subtitle">Sustainable Housing for Uzbekistan's Regional Cities</div>
+            <p>
+                A 5-story, 40-unit affordable apartment building designed for 
+                Uzbekistan's continental climate. Features passive solar design, 
+                local materials, and circular economy principles.
+            </p>
+        </div>
+
+        <!-- Day/Night Toggle -->
+        <div id="time-toggle">
+            <button class="time-btn active" onclick="setTimeOfDay('day')">☀️ Day</button>
+            <button class="time-btn" onclick="setTimeOfDay('sunset')">🌅 Sunset</button>
+            <button class="time-btn" onclick="setTimeOfDay('night')">🌙 Night</button>
+        </div>
+
+        <!-- Controls -->
+        <div id="controls-panel">
+            <h3>🎮 Controls</h3>
+            <div><kbd>Left Click</kbd> + Drag → Rotate</div>
+            <div><kbd>Right Click</kbd> + Drag → Pan</div>
+            <div><kbd>Scroll</kbd> → Zoom</div>
+            <div>Click features below to highlight</div>
+        </div>
+
+        <!-- Feature Buttons -->
+        <div id="feature-panel">
+            <button class="feature-btn" onclick="highlightFeature('solar')">
+                <span class="icon">☀️</span> Solar Panels
+            </button>
+            <button class="feature-btn" onclick="highlightFeature('greenroof')">
+                <span class="icon">🌱</span> Green Roof
+            </button>
+            <button class="feature-btn" onclick="highlightFeature('courtyard')">
+                <span class="icon">🌳</span> Central Courtyard
+            </button>
+            <button class="feature-btn" onclick="highlightFeature('water')">
+                <span class="icon">💧</span> Rainwater System
+            </button>
+            <button class="feature-btn" onclick="highlightFeature('insulation')">
+                <span class="icon">🧱</span> Thermal Mass
+            </button>
+            <button class="feature-btn" onclick="highlightFeature('ventilation')">
+                <span class="icon">💨</span> Natural Ventilation
+            </button>
+            <button class="feature-btn" onclick="highlightFeature('shading')">
+                <span class="icon">🏗️</span> Sun Shading
+            </button>
+            <button class="feature-btn" onclick="highlightFeature('landscape')">
+                <span class="icon">🌿</span> Landscaping
+            </button>
+        </div>
+
+        <!-- Feature Detail Popup -->
+        <div id="feature-detail">
+            <span class="close-btn" onclick="closeDetail()">✕</span>
+            <h3 id="detail-title"></h3>
+            <p id="detail-desc"></p>
+            <div id="detail-stats"></div>
+        </div>
+    </div>
+
+    <!-- Three.js from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
+    <!-- Main 3D Script -->
+    <script src="building.js"></script>
+</body>
+</html>
