@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/3d-model/index.html" },
+    { "source": "/(.*)", "destination": "/3d-model/$1" }
+  ]
+}
