@@ -109,3 +109,25 @@ MIT License — Free to use, modify, and distribute.
 ## 👤 Author
 
 **Umidjon-24** — Circular Economy ECON330, New Uzbekistan University
+
+
+## Civil / Landscape layer
+
+The interactive viewer now includes a **72 ? 58 m concept plot** (4,176 m?), with north along -Z and east along +X. The existing five-storey building geometry and its lighting modes are retained. Plot dimensions are a design assumption, not a surveyed boundary.
+
+- Car-free community courtyard south of the entrance: 8 ? 7 m play area, four benches, shade trees and shared planting.
+- Deciduous south/west trees, mulched low planting and no large lawns.
+- Connected 2 m pedestrian routes, entrance plaza, six cycle stands and a street-side bus stop.
+- Six permeable parking bays on the east edge, including a wider end bay with a transfer strip; vehicles enter from the street along the east-edge aisle.
+- An 18 m planted rain garden beside parking, runoff arrows, cistern overflow and a blue schematic rainwater-to-drip-irrigation route. The displayed blue pipe is a diagrammatic connection, not a literal above-ground installation detail.
+- A screened waste-sorting and covered compost point at the courtyard service edge.
+
+Use **Site Plan** in the camera controls for a north-up orthographic drawing with labels, boundary dimensions, legend and a metre-based scale bar. Pan and zoom remain available; rotation is locked in plan. **3D View** restores orbit controls. All eight original feature buttons remain, alongside eight civil highlights. Clicking site geometry also opens its feature explanation. Escape closes the explanation and restores materials.
+
+For a presentation: start with Site Plan, explain the courtyard and pedestrian route, then parking and the rain garden. Return to 3D View for trees, play equipment and the visible water connection. The new layer is in `3d-model/civil-site.js`; the existing OBJ export and Python generator have not been extended with this layer.
+
+### Verification
+
+Run `node verify-site.mjs` from `3d-model/` with Node 18+ and network access, or pass a local Three.js r128 file as its first argument. Checks use actual Three.js geometry/math with stubbed DOM, renderer and orbit input: scene creation, all 16 highlights and restoration, plan/perspective transitions, portrait/landscape camera fitting and three lighting modes. This is not a substitute for browser/WebGL visual inspection.
+
+Drainage capacity, infiltration, local plant selection, accessible parking dimensions and emergency/service access require site-specific design verification before construction.

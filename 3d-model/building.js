@@ -136,7 +136,7 @@ function init() {
 
     // ---- Camera ----
     camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 500);
-    camera.position.set(55, 35, 50);
+    camera.position.set(65, 48, 72);
     camera.lookAt(0, 8, 0);
 
     // ---- Controls ----
@@ -144,9 +144,9 @@ function init() {
     controls.enableDamping = true;
     controls.dampingFactor = 0.08;
     controls.minDistance = 20;
-    controls.maxDistance = 120;
+    controls.maxDistance = 150;
     controls.maxPolarAngle = Math.PI / 2.05;
-    controls.target.set(0, 8, 0);
+    controls.target.set(0, 5, 8);
     controls.update();
 
     // ---- Lighting ----
@@ -162,6 +162,7 @@ function init() {
     createShadingDevices();
     createVentilationIndicators();
     createLandscaping();
+    createCivilSite();
     createSurroundings();
 
     // ---- Events ----
@@ -259,64 +260,10 @@ function setupLighting(mode) {
 // ============================================================
 // GROUND & TERRAIN
 // ============================================================
-function createGround() {
-    // Main ground plane
-    const groundGeo = new THREE.PlaneGeometry(200, 200);
-    const groundMat = new THREE.MeshStandardMaterial({
-        color: 0xC4B896,  // Sandy Uzbek soil
-        roughness: 0.95,
-        metalness: 0.0
-    });
-    const ground = new THREE.Mesh(groundGeo, groundMat);
-    ground.rotation.x = -Math.PI / 2;
-    ground.position.y = -0.1;
-    ground.receiveShadow = true;
-    scene.add(ground);
+function createGround() { const ground=new THREE.Mesh(new THREE.PlaneGeometry(200,200),new THREE.MeshStandardMaterial({color:0xc4b896,roughness:0.95})); ground.rotation.x=-Math.PI/2;ground.position.y=-0.1;ground.receiveShadow=true;scene.add(ground); }
 
-    // Property boundary — permeable paving
-    const pavingGeo = new THREE.PlaneGeometry(60, 40);
-    const pavingMat = new THREE.MeshStandardMaterial({
-        color: 0xA89070,
-        roughness: 0.85,
-        metalness: 0.05
-    });
-    const paving = new THREE.Mesh(pavingGeo, pavingMat);
-    paving.rotation.x = -Math.PI / 2;
-    paving.position.y = 0.01;
-    paving.receiveShadow = true;
-    scene.add(paving);
 
-    // Walkways (permeable pavers)
-    createPermWalkways();
-}
 
-function createPermWalkways() {
-    const walkMat = new THREE.MeshStandardMaterial({
-        color: 0x8B7355,
-        roughness: 0.8,
-    });
-    
-    // Front walkway
-    const w1 = new THREE.Mesh(new THREE.BoxGeometry(20, 0.12, 2.5), walkMat);
-    w1.position.set(0, 0.06, BUILDING.depth / 2 + 4);
-    w1.receiveShadow = true;
-    scene.add(w1);
-
-    // Side walkways
-    const w2 = new THREE.Mesh(new THREE.BoxGeometry(2, 0.12, BUILDING.depth + 8), walkMat);
-    w2.position.set(BUILDING.width / 2 + 3, 0.06, 0);
-    w2.receiveShadow = true;
-    scene.add(w2);
-
-    const w3 = new THREE.Mesh(new THREE.BoxGeometry(2, 0.12, BUILDING.depth + 8), walkMat);
-    w3.position.set(-BUILDING.width / 2 - 3, 0.06, 0);
-    w3.receiveShadow = true;
-    scene.add(w3);
-}
-
-// ============================================================
-// MAIN BUILDING
-// ============================================================
 function createBuilding() {
     buildingGroup = new THREE.Group();
     buildingGroup.name = 'building';
@@ -699,110 +646,8 @@ function createGreenRoof() {
 // ============================================================
 // CENTRAL COURTYARD
 // ============================================================
-function createCourtyard() {
-    courtyardGroup = new THREE.Group();
-    courtyardGroup.name = 'courtyard';
+function createCourtyard() { createCommunityCourtyard(); }
 
-    // Courtyard ground (grass/paving)
-    const grassMat = new THREE.MeshStandardMaterial({ color: 0x7CB342, roughness: 0.9 });
-    const grassGeo = new THREE.BoxGeometry(BUILDING.courtyardWidth, 0.08, BUILDING.courtyardDepth);
-    const grass = new THREE.Mesh(grassGeo, grassMat);
-    grass.position.set(0, 0.04, 0);
-    grass.receiveShadow = true;
-    courtyardGroup.add(grass);
-
-    // Central water feature / fountain
-    const fountainBaseMat = new THREE.MeshStandardMaterial({ color: 0x90A4AE, roughness: 0.3, metalness: 0.4 });
-    const fountainBase = new THREE.Mesh(
-        new THREE.CylinderGeometry(1.2, 1.4, 0.4, 16),
-        fountainBaseMat
-    );
-    fountainBase.position.set(0, 0.2, 0);
-    fountainBase.castShadow = true;
-    courtyardGroup.add(fountainBase);
-
-    // Water surface
-    const waterMat = new THREE.MeshStandardMaterial({
-        color: 0x4FC3F7,
-        roughness: 0.05,
-        metalness: 0.3,
-        transparent: true,
-        opacity: 0.7
-    });
-    const water = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.1, 0.05, 16), waterMat);
-    water.position.set(0, 0.38, 0);
-    courtyardGroup.add(water);
-
-    // Fountain center piece
-    const centerPiece = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.15, 0.2, 0.8, 8),
-        fountainBaseMat
-    );
-    centerPiece.position.set(0, 0.7, 0);
-    courtyardGroup.add(centerPiece);
-
-    // Trees in courtyard (4 deciduous trees)
-    const treePositions = [
-        [-3, 0, -2.5], [3, 0, -2.5],
-        [-3, 0, 2.5], [3, 0, 2.5]
-    ];
-    treePositions.forEach(pos => {
-        const tree = createDeciduousTree(2.5 + Math.random() * 1);
-        tree.position.set(pos[0], pos[1], pos[2]);
-        courtyardGroup.add(tree);
-    });
-
-    // Garden beds (community plots)
-    const bedMat = new THREE.MeshStandardMaterial({ color: 0x5D4037, roughness: 0.95 });
-    const plantMat = new THREE.MeshStandardMaterial({ color: 0x4CAF50, roughness: 0.9 });
-    for (let i = 0; i < 4; i++) {
-        const bed = new THREE.Group();
-        const soil = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.25, 0.8), bedMat);
-        soil.position.y = 0.12;
-        bed.add(soil);
-        
-        // Plants in bed
-        for (let p = 0; p < 4; p++) {
-            const plant = new THREE.Mesh(
-                new THREE.SphereGeometry(0.15 + Math.random() * 0.1, 6, 5),
-                plantMat
-            );
-            plant.position.set(-0.6 + p * 0.4, 0.35, 0);
-            bed.add(plant);
-        }
-        
-        bed.position.set(-2.5 + i * 1.8, 0, i < 2 ? -3.5 : 3.5);
-        if (i >= 2) bed.position.x = -2.5 + (i - 2) * 1.8 + 3;
-        courtyardGroup.add(bed);
-    }
-
-    // Bench seating
-    const benchMat = new THREE.MeshStandardMaterial({ color: 0x795548, roughness: 0.7 });
-    [[2, 0.3, 0], [-2, 0.3, 0]].forEach(pos => {
-        const bench = new THREE.Group();
-        const seat = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.08, 0.4), benchMat);
-        seat.position.y = 0.45;
-        bench.add(seat);
-        const backrest = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.5, 0.06), benchMat);
-        backrest.position.set(0, 0.7, -0.18);
-        bench.add(backrest);
-        // Legs
-        [[-0.8, 0], [0.8, 0]].forEach(([lx, lz]) => {
-            const leg = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.45, 0.35), benchMat);
-            leg.position.set(lx, 0.22, lz);
-            bench.add(leg);
-        });
-        bench.position.set(pos[0], pos[1], pos[2]);
-        bench.rotation.y = pos[0] > 0 ? Math.PI / 2 : -Math.PI / 2;
-        courtyardGroup.add(bench);
-    });
-
-    scene.add(courtyardGroup);
-}
-
-// ============================================================
-// TREES (reusable)
-// ============================================================
 function createDeciduousTree(height) {
     const tree = new THREE.Group();
     
@@ -911,24 +756,6 @@ function createWaterSystem() {
     hPipe.position.set(BUILDING.width / 2 + 2.5, 0, -3);
     hPipe.rotation.z = Math.PI / 2;
     waterSystemGroup.add(hPipe);
-
-    // Bioswale (gravel trench with plants)
-    const bioswaleGeo = new THREE.BoxGeometry(25, 0.3, 1.5);
-    const bioswaleMat = new THREE.MeshStandardMaterial({ color: 0x7E8C6A, roughness: 0.9 });
-    const bioswale = new THREE.Mesh(bioswaleGeo, bioswaleMat);
-    bioswale.position.set(0, 0.05, BUILDING.depth / 2 + 8);
-    bioswale.receiveShadow = true;
-    waterSystemGroup.add(bioswale);
-
-    // Bioswale plants
-    for (let i = 0; i < 12; i++) {
-        const reed = new THREE.Mesh(
-            new THREE.ConeGeometry(0.1, 0.5, 4),
-            new THREE.MeshStandardMaterial({ color: 0x558B2F })
-        );
-        reed.position.set(-11 + i * 2, 0.4, BUILDING.depth / 2 + 8);
-        waterSystemGroup.add(reed);
-    }
 
     scene.add(waterSystemGroup);
 }
@@ -1063,72 +890,7 @@ function createVentilationIndicators() {
 // ============================================================
 // LANDSCAPING
 // ============================================================
-function createLandscaping() {
-    landscapeGroup = new THREE.Group();
-    landscapeGroup.name = 'landscape';
-
-    // Perimeter trees
-    const treeLinePositions = [
-        // Front (south)
-        [-20, 0, 16], [-14, 0, 16], [-8, 0, 15], [8, 0, 15], [14, 0, 16], [20, 0, 16],
-        // East side
-        [22, 0, 8], [22, 0, 0], [22, 0, -8],
-        // West side
-        [-22, 0, 8], [-22, 0, 0], [-22, 0, -8],
-        // Back (north)
-        [-14, 0, -16], [0, 0, -16], [14, 0, -16],
-    ];
-
-    treeLinePositions.forEach((pos, i) => {
-        let tree;
-        if (i % 3 === 0) {
-            tree = createConiferTree(4 + Math.random() * 2);
-        } else {
-            tree = createDeciduousTree(3 + Math.random() * 2);
-        }
-        tree.position.set(pos[0], pos[1], pos[2]);
-        landscapeGroup.add(tree);
-    });
-
-    // Fruit trees (pomegranate/apricot) — represented with colorful canopies
-    const fruitTreePositions = [
-        [-6, 0, 12], [6, 0, 12], [-10, 0, 12], [10, 0, 12]
-    ];
-    fruitTreePositions.forEach(pos => {
-        const tree = createFruitTree(2.5);
-        tree.position.set(pos[0], pos[1], pos[2]);
-        landscapeGroup.add(tree);
-    });
-
-    // Shrub hedges along walkways
-    const hedgeMat = new THREE.MeshStandardMaterial({ color: 0x4CAF50, roughness: 0.9 });
-    [
-        [0, 0.4, BUILDING.depth / 2 + 2, 18, 0.8, 0.6],
-        [BUILDING.width / 2 + 1.5, 0.35, 0, 0.6, 0.7, 10],
-        [-BUILDING.width / 2 - 1.5, 0.35, 0, 0.6, 0.7, 10],
-    ].forEach(([x, y, z, w, h, d]) => {
-        const hedge = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), hedgeMat);
-        hedge.position.set(x, y, z);
-        hedge.castShadow = true;
-        hedge.receiveShadow = true;
-        landscapeGroup.add(hedge);
-    });
-
-    // Ground cover / lawn patches
-    const lawnMat = new THREE.MeshStandardMaterial({ color: 0x7CB342, roughness: 0.95 });
-    [
-        [0, 0.02, 13, 22, 0.04, 5],
-        [20, 0.02, 0, 5, 0.04, 15],
-        [-20, 0.02, 0, 5, 0.04, 15],
-    ].forEach(([x, y, z, w, h, d]) => {
-        const lawn = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), lawnMat);
-        lawn.position.set(x, y, z);
-        lawn.receiveShadow = true;
-        landscapeGroup.add(lawn);
-    });
-
-    scene.add(landscapeGroup);
-}
+function createLandscaping() { createSiteLandscape(); }
 
 function createFruitTree(height) {
     const tree = new THREE.Group();
@@ -1176,52 +938,10 @@ createInsulationVisual();
 // ============================================================
 // SURROUNDING CONTEXT
 // ============================================================
-function createSurroundings() {
-    // Road
-    const roadMat = new THREE.MeshStandardMaterial({ color: 0x424242, roughness: 0.9 });
-    const road = new THREE.Mesh(new THREE.BoxGeometry(200, 0.05, 8), roadMat);
-    road.position.set(0, 0.02, 25);
-    road.receiveShadow = true;
-    scene.add(road);
+function createSurroundings() { createSiteStreet(); }
 
-    // Road markings
-    const markMat = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, roughness: 0.5 });
-    for (let i = -20; i <= 20; i++) {
-        const mark = new THREE.Mesh(new THREE.BoxGeometry(2, 0.06, 0.15), markMat);
-        mark.position.set(i * 5, 0.06, 25);
-        scene.add(mark);
-    }
 
-    // Sidewalk
-    const sidewalkMat = new THREE.MeshStandardMaterial({ color: 0x9E9E9E, roughness: 0.8 });
-    const sidewalk = new THREE.Mesh(new THREE.BoxGeometry(200, 0.08, 2.5), sidewalkMat);
-    sidewalk.position.set(0, 0.04, 20.5);
-    sidewalk.receiveShadow = true;
-    scene.add(sidewalk);
 
-    // Compass rose indicator (N/S/E/W)
-    addCompassLabels();
-}
-
-function addCompassLabels() {
-    // Simple directional markers on ground
-    const markerMat = new THREE.MeshStandardMaterial({ color: 0xE53935, roughness: 0.5 });
-    
-    // North arrow
-    const nArrow = new THREE.Mesh(new THREE.ConeGeometry(0.5, 2, 4), markerMat);
-    nArrow.position.set(-25, 0.5, -18);
-    nArrow.rotation.x = 0;
-    scene.add(nArrow);
-
-    // N label base
-    const nBase = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.1, 1.5), markerMat);
-    nBase.position.set(-25, 0.05, -18);
-    scene.add(nBase);
-}
-
-// ============================================================
-// FEATURE HIGHLIGHTING
-// ============================================================
 function highlightFeature(featureName) {
     // Reset previous highlight
     resetHighlight();
@@ -1230,7 +950,7 @@ function highlightFeature(featureName) {
 
     // Update button states
     document.querySelectorAll('.feature-btn').forEach(btn => btn.classList.remove('active'));
-    event.target.closest('.feature-btn').classList.add('active');
+    document.querySelectorAll('.feature-btn').forEach(btn => { if(btn.dataset.feature === featureName) btn.classList.add('active'); });
 
     // Show detail panel
     const data = featureData[featureName];
@@ -1244,56 +964,29 @@ function highlightFeature(featureName) {
     document.getElementById('detail-stats').innerHTML = statsHtml;
     document.getElementById('feature-detail').style.display = 'block';
 
-    // Highlight effect — make targeted group glow, dim others
-    const groups = {
-        solar: solarPanels,
-        greenroof: greenRoofGroup,
-        courtyard: courtyardGroup,
-        water: waterSystemGroup,
-        insulation: buildingGroup,
-        ventilation: ventilationGroup,
-        shading: shadingGroup,
-        landscape: landscapeGroup
-    };
-
-    // Dim non-highlighted groups
-    Object.entries(groups).forEach(([key, group]) => {
-        if (!group) return;
-        if (key === featureName) {
-            // Pulse/highlight effect
-            group.traverse(child => {
-                if (child.isMesh && child.material) {
-                    child.userData.origEmissive = child.material.emissive ? child.material.emissive.getHex() : 0;
-                    if (child.material.emissive) {
-                        child.material.emissive.setHex(0x2E7D32);
-                        child.material.emissiveIntensity = 0.3;
-                    }
-                }
-            });
-        } else if (key !== 'insulation' || featureName !== 'insulation') {
-            group.traverse(child => {
-                if (child.isMesh && child.material) {
-                    child.userData.origOpacity = child.material.opacity;
-                    child.userData.origTransparent = child.material.transparent;
-                    child.material.transparent = true;
-                    child.material.opacity = Math.min(child.material.opacity, 0.35);
-                }
-            });
-        }
-    });
+    applyFeatureHighlight(featureName);
 
     // Camera focus on feature
     const targets = {
         solar: { pos: [30, 30, 20], target: [0, BUILDING.totalHeight, 0] },
         greenroof: { pos: [25, 28, -15], target: [0, BUILDING.totalHeight, -BUILDING.depth / 2] },
-        courtyard: { pos: [20, 12, 15], target: [0, 1, 0] },
+        courtyard: { pos: [35, 30, 48], target: [0, 1, 21] },
         water: { pos: [30, 15, -5], target: [BUILDING.width / 2 + 3, 2, -3] },
         insulation: { pos: [35, 20, 25], target: [0, 8, 0] },
         ventilation: { pos: [15, 25, 10], target: [0, BUILDING.totalHeight / 2, 0] },
         shading: { pos: [25, 15, 25], target: [0, 8, BUILDING.depth / 2] },
-        landscape: { pos: [45, 18, 30], target: [0, 2, 10] },
+        landscape: { pos: [-46, 28, 48], target: [-12, 2, 18] },
+        community: { pos: [35, 30, 48], target: [0, 1, 21] },
+        trees: { pos: [-46, 28, 48], target: [-15, 2, 18] },
+        paving: { pos: [46, 40, 53], target: [10, 0, 20] },
+        raingarden: { pos: [49, 28, 40], target: [19, 1, 15] },
+        access: { pos: [36, 35, 55], target: [0, 1, 24] },
+        parking: { pos: [53, 26, 40], target: [28, 0, 20] },
+        waste: { pos: [-38, 20, 41], target: [-20, 1, 24] },
     };
 
+    if (featureName === 'site') { setSitePlan(true); return; }
+    if (planMode) return;
     if (targets[featureName]) {
         const t = targets[featureName];
         animateCamera(
@@ -1303,35 +996,16 @@ function highlightFeature(featureName) {
     }
 }
 
-function resetHighlight() {
-    const allGroups = [solarPanels, greenRoofGroup, courtyardGroup, waterSystemGroup, 
-                       buildingGroup, ventilationGroup, shadingGroup, landscapeGroup];
-    allGroups.forEach(group => {
-        if (!group) return;
-        group.traverse(child => {
-            if (child.isMesh && child.material) {
-                if (child.userData.origEmissive !== undefined && child.material.emissive) {
-                    child.material.emissive.setHex(child.userData.origEmissive);
-                    child.material.emissiveIntensity = 0;
-                }
-                if (child.userData.origOpacity !== undefined) {
-                    child.material.opacity = child.userData.origOpacity;
-                    child.material.transparent = child.userData.origTransparent;
-                }
-            }
-        });
-    });
-    currentHighlight = null;
-}
+function resetHighlight() { restoreFeatureMaterials(); currentHighlight=null; }
 
 function closeDetail() {
     document.getElementById('feature-detail').style.display = 'none';
     resetHighlight();
     document.querySelectorAll('.feature-btn').forEach(btn => btn.classList.remove('active'));
-    // Reset camera
+    if (planMode) return;
     animateCamera(
-        new THREE.Vector3(55, 35, 50),
-        new THREE.Vector3(0, 8, 0)
+        new THREE.Vector3(65, 48, 72),
+        new THREE.Vector3(0, 5, 8)
     );
 }
 
@@ -1339,6 +1013,7 @@ function closeDetail() {
 // CAMERA ANIMATION
 // ============================================================
 function animateCamera(targetPos, targetLookAt) {
+    cancelAnimationFrame(cameraAnimationFrame);
     const startPos = camera.position.clone();
     const startTarget = controls.target.clone();
     const duration = 1200;
@@ -1355,7 +1030,7 @@ function animateCamera(targetPos, targetLookAt) {
         controls.update();
 
         if (t < 1) {
-            requestAnimationFrame(update);
+            cameraAnimationFrame = requestAnimationFrame(update);
         }
     }
     update();
@@ -1366,7 +1041,7 @@ function animateCamera(targetPos, targetLookAt) {
 // ============================================================
 function setTimeOfDay(mode) {
     document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
-    event.target.classList.add('active');
+    document.querySelectorAll('.time-btn').forEach(b => b.classList.toggle('active',b.dataset.time === mode));
     setupLighting(mode);
 }
 
@@ -1394,7 +1069,8 @@ function animate() {
 // RESIZE HANDLER
 // ============================================================
 function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
+    perspectiveCamera.aspect = window.innerWidth / window.innerHeight;
+    perspectiveCamera.updateProjectionMatrix();
+    fitSitePlan();
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
