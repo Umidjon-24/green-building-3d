@@ -146,6 +146,7 @@
         #feature-detail .stat {
             display: flex;
             justify-content: space-between;
+            gap: 12px;
             padding: 6px 0;
             border-bottom: 1px solid rgba(255,255,255,0.06);
         }
@@ -238,7 +239,7 @@
             #info-panel h1 { font-size: 16px; } #info-panel p { display: none; }
             #info-panel .subtitle { margin-bottom: 0; font-size: 10px; }
             #controls-panel { top: 90px; right: 10px; padding: 8px; }
-            #controls-panel > h3, #controls-panel > div:not(#view-toggle) { display: none; }
+            #controls-panel > h3, #controls-panel > div:not(#view-toggle):not(:has(a)) { display: none; }
             #time-toggle { top: 97px; left: 10px; }
             .time-btn { padding: 6px 8px; }
             #feature-panel { bottom: 10px; max-height: 23vh; gap: 4px; }
@@ -265,9 +266,9 @@
             <h1>🌿 Green Apartment Building</h1>
             <div class="subtitle">Sustainable Housing for Uzbekistan's Regional Cities</div>
             <p>
-                A 5-story, 40-unit affordable apartment building designed for 
+                A 5-story, 40-unit apartment building with one elevator, designed for
                 Uzbekistan's continental climate. Features passive solar design, 
-                local materials, and circular economy principles.
+                local materials, and circular economy principles. Rooftop planting is removed.
             </p>
         </div>
 
@@ -285,6 +286,7 @@
             <div><kbd>Right Click</kbd> + Drag → Pan</div>
             <div><kbd>Scroll</kbd> → Zoom</div>
             <div>Click features below to highlight</div>
+            <div><a href="/cost-estimate.html" style="color:#a5d9b5;font-weight:600">Cost estimate &amp; budget</a></div>
             <div id="view-toggle" role="group" aria-label="Camera view">
                 <button class="view-btn" id="perspective-view" aria-pressed="true" onclick="showPerspective()">3D View</button>
                 <button class="view-btn" id="site-view" aria-pressed="false" onclick="showSitePlan()">Site Plan</button>
@@ -297,7 +299,7 @@
                 <span class="icon">☀️</span> Solar Panels
             </button>
             <button class="feature-btn" onclick="highlightFeature('greenroof')">
-                <span class="icon">🌱</span> Green Roof
+                <span class="icon">▱</span> Insulated Roof
             </button>
             <button class="feature-btn" onclick="highlightFeature('courtyard')">
                 <span class="icon">🌳</span> Central Courtyard

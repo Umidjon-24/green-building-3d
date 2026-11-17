@@ -17,6 +17,7 @@ const COST = {
     WIN:{name:'ASABIYYA — PVC window catalogue',url:'https://asabiyya.uz/katalog/okna/',note:'Accessed 17 Nov 2026; undated list. Quattro PVC range UZS 700,000–1,400,000/m². Opening pattern, glass specification, Samarkand installation and VAT must be quoted.'},
     PV:{name:'ANDIJAN YASHIL ENERGIYA — 30 kW on-grid system',url:'https://stroyka.uz/offer/30-kvt-on-grid-solnecnaya-fotoelektriceskaya-stanciya',note:'Opened listing updated 24 Sep 2026: UZS 120m per 30 kW system. Detailed supply/install split and VAT unclear. Adopt net-equivalent equipment anchor plus separate roof installation and connection allowances. No batteries.'},
     TILE:{name:'MILANO / Orient Ceramic — 60 × 60 tile',url:'https://stroyka.uz/offer/keramogranit-60x60-matovyi-model-2200',note:'Updated 11 Feb 2026: from UZS 51,000/m² supply only. Rates below add waste, adhesive, grout, transport and laying; reconfirm slip rating and stock.'},
+    LIFT:{name:'Uplift Sistems — 630 kg machine-room-less passenger lift',url:'https://stroyka.uz/offer/passazirskii-lift-630-kg-8-cel-bmp-1-ms',note:'Updated 5 Oct 2026: from UZS 165,394,000/system, 1 m/s, 630 kg. Stop count, installation, VAT and delivery not fully specified. Net anchor approx. USD 12,282 if VAT-inclusive; budget equipment USD 13,000–22,000 plus separate install, shaft and power allowances. A five-stop accessible specification requires a quote.'},
     VAT:{name:'Government — 2026 standard VAT rate',url:'https://gov.uz/oz/urganch/news/view/138410',note:'3 Mar 2026: standard VAT 12%. Budget assumes unrecoverable VAT on taxable works/services; no blanket VAT on land, interest or tax itself. Actual developer recovery/exemption needs tax advice.'},
     ELEC:{name:'Cabinet Resolution 243 — energy tariffs',url:'https://www.lex.uz/docs/-8195731?ONDATE=01.11.2026+00',note:'From 1 Jun 2026: groups I/II/IV electricity UZS 1,100/kWh incl. VAT; ordinary household bands start 650/900/1,100. Gas general tariff UZS 2,000/m³, household base UZS 1,100. Meter/account classification must be confirmed.'},
     WATER:{name:'Samarkand council decision, 24 March 2025',url:'https://samarkand.uz/uploads/news_foto/2022/11/40-Suv-tarifi-oshirish.pdf',note:'Domestic water UZS 2,800/m³ excluding VAT = 3,136 including VAT. Latest applicable local primary schedule located; no 2026 replacement verified. No sewer saving credited for irrigation.'},
@@ -52,7 +53,7 @@ const COST = {
     ['B10','Slab reinforcement installed',69.6,'t',[820,1000,1250],'A','Low',['STEEL','QS'],'580 m³ × 120 kg/m³ incl. laps/waste; structural design may materially change this.'],
     ['B11','Slab soffit / edge formwork',3100,'m² contact',[12,17,25],'E','Low',['QS'],'2,900 m² soffits plus 200 m² edges.'],
     ['B12','Ground-bearing floor slab complete',600,'m²',[25,35,50],'A','Low',['CON','STEEL','QS'],'150 mm RC slab, mesh, placement and DPM; excludes finish screed.'],
-    ['B13','Two RC stairs and landings complete',20,'flight equivalents',[650,950,1400],'E','Low',['QS'],'2 stair cores × 5 storeys × 2 flights; includes concrete, reinforcement, forms; finish/rails in D16–17.'],
+    ['B13','Two RC stairs and landings complete',20,'flight equivalents',[650,950,1400],'E','Low',['QS'],'2 stair cores × 5 storeys × 2 flights, including roof access; includes concrete, reinforcement, forms; finish/rails in D14 and D16.'],
     ['B14','Balcony slabs, thermal details and parapets',80,'m²',[75,110,160],'E','Low',['QS'],'40 modest balconies × 2 m²; excludes railings and surface finish.'],
     ['B15','External AAC infill complete',390,'m³',[65,85,115],'A','Medium',['AAC','AAC2','QS'],'1,300 m² net walls × 0.30 m. Source block net ~USD 41.58–57.92/m³ + waste, adhesive, ties, delivery and laying.'],
     ['B16','Internal masonry / AAC partitions',360,'m³',[65,85,115],'A','Low',['AAC','AAC2','QS'],'2,400 m² wall centreline face area × average 0.15 m; acoustic/fire separation sizes to verify.'],
@@ -63,11 +64,12 @@ const COST = {
     ['B21','Roof insulation, falls and waterproofing',600,'m²',[28,38,55],'E','Low',['QS'],'Whole roof: assumed 150 mm insulation, vapour control, falls and membrane. RC roof slab in B09.'],
     ['B22','Roof edges, gutters and downpipes',150,'lm',[15,22,34],'E','Low',['QS'],'Base drainage for full roof, including overflow details; rainwater treatment is C19–22.'],
     ['B23','External horizontal/vertical shading',100,'m² projected',[45,65,95],'E','Low',['QS'],'Approx. 100 openings × 1 m² shade area; durable local fabricated system.'],
-    ['B24','Extensive green roof extra layers',200,'m²',[30,45,70],'E','Low',['QS'],'Root barrier, drainage, filter, 100 mm substrate, plants, delivery/install. Base membrane excluded here.'],
-    ['B25','Green roof structural load allowance',200,'m²',[5,10,20],'E','Low',['QS'],'Additional reinforcement/load detailing beyond base frame, not a structural certification.'],
+    ['B24','Rooftop planting — excluded by revised brief',0,'m²',[30,45,70],'E','Low',['QS'],'Zero quantity: rooftop soil, plants and drainage layers removed. Rates retained only as an optional reference; no cost included. Insulated waterproof roof remains B21.'],
+    ['B25','Green roof extra structural load — excluded',0,'m²',[5,10,20],'E','Low',['QS'],'Zero quantity: no allowance for planted-roof loading. PV anchorage remains included.'],
     ['B26','30 kW PV equipment package',1,'system',[8000,9000,11500],'A','Medium',['PV','QS'],'120m UZS ÷ 1.12 ÷ FX ≈ USD 8,911 assumed net; round to USD 9,000. Panels, inverter, BOS and mounting supply assumed in bundle.'],
     ['B27','PV installation, anchoring and commissioning',30,'kWp',[55,85,130],'E','Low',['QS'],'Roof labour, wind/seismic anchoring and electrical tests; equipment not repeated.'],
     ['B28','PV metering / grid connection allowance',1,'allowance',[500,1000,2500],'E','Low',['QS'],'Existing building service in A09; export approval/subsidy not assumed.'],
+    ['B29','Elevator shaft, pit and structural coordination',1,'shaft',[7000,11000,18000],'E','Low',['QS'],'One five-stop shaft: provisional incremental pit, RC enclosure, openings, waterproofing and local strengthening beyond generic frame quantities. Supplier pit/headroom dimensions and layout to be coordinated; no second elevator.'],
     ['C01','Gas boiler plant, approx. 2 × 100 kW',2,'boilers',[1800,2600,4000],'E','Low',['QS'],'New quoted equipment needed; 200 kW concept capacity, peak heat loss and DHW duty uncalculated.'],
     ['C02','Boiler room hydraulic fit-out and flue',1,'system',[5000,8000,13000],'E','Low',['QS'],'Pumps, buffer/control, manifold, flue and commissioning; no duplicate boiler supply.'],
     ['C03','Heating distribution and radiators',2900,'m² GFA',[10,14,20],'E','Low',['QS'],'Installed pipework, insulation, valves, radiators and balancing; apartment-level allowance.'],
@@ -93,6 +95,9 @@ const COST = {
     ['C23','Greywater treatment and control plant',1,'system',[5000,9000,15000],'E','Low',['QS'],'Small packaged treatment allowance; irrigation reuse only, design/sampling required.'],
     ['C24','Greywater separation and reuse pipework',40,'apartments',[120,180,280],'E','Low',['QS'],'Showers/basins separate from blackwater; no double counting of rainwater toilet pipework.'],
     ['C25','Integrated MEP testing and handover',1,'allowance',[2000,3500,6000],'E','Low',['QS'],'Final system commissioning and O&M documentation beyond trade tests.'],
+    ['C26','Passenger elevator: 630 kg, five stops, MRL',1,'lift',[13000,17000,22000],'A','Low',['LIFT','QS'],'Equipment: cabin, drive, controller, landing doors and automatic rescue allowance. Listing from 165,394,000 / 1.12 / FX ≈ USD 12,282; five-stop/accessible configuration, freight and specification uplift estimated. No duplicate equipment in installation row.'],
+    ['C27','Elevator installation, inspection and commissioning',1,'service',[3000,4500,7000],'E','Low',['QS'],'Local erection, testing, certification allowance and first-year service; confirm supplier exclusions.'],
+    ['C28','Elevator dedicated supply and safety interfaces',1,'system',[1000,1800,3000],'E','Low',['QS'],'Dedicated isolator/feeder, earthing, alarm interfaces and shaft lighting beyond C13. Rescue system assumed battery-based; whole-building generator excluded.'],
     ['D01','Apartment levelling screed',2400,'m²',[5,7,10],'E','Medium',['QS'],'Net apartment area once; structural slab in B12/B09.'],
     ['D02','Dry-room flooring and skirting',1800,'m²',[10,14,20],'E','Low',['QS'],'75% of net area; economy durable laminate/vinyl, underlay and installation.'],
     ['D03','Kitchen / wet-room floor tiles',600,'m²',[12,17,24],'A','Medium',['TILE','QS'],'25% of net area. 51,000 UZS ÷ 1.12 ÷ FX ≈ USD 3.79 material floor anchor; rate adds waste/adhesive/labour.'],
@@ -136,7 +141,6 @@ function estimate(scenario=1, options={}) {
   for(const i of items) {
     if(options.land && i.id==='A01') {i.qty=0;i.note+=' Publicly provided land: zero cash acquisition; economic value excluded.';}
     if(options.grey && ['C23','C24'].includes(i.id)) i.qty=0;
-    if(options.roof && ['B24','B25'].includes(i.id)) i.qty=50;
     if(options.solarhot && i.id==='C11') i.qty=0;
     if(options.rain && i.id==='C22') i.qty=0;
     if(options.rain && i.id==='C21') {i.rate=[900,1500,2400][scenario];i.note+=' Irrigation-only filter/pump; toilet disinfection omitted.';}

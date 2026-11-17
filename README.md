@@ -1,3 +1,16 @@
+## Revised cost plan — 17 November 2026
+
+Open `/cost` on Vercel, or `/cost-estimate.html` when serving the repository root locally. The viewer includes a **Cost estimate & budget** link.
+
+- The cost brief is **five storeys, 40 homes, one five-stop elevator, 2,900 m² GFA and a 2,500 m² site**. Rooftop planting is excluded; an insulated roof and PV remain. The 3D viewer now displays an unplanted roof with a schematic lift overrun.
+- `cost-data.js` contains 106 direct line items (including two zero-quantity roof exclusions), dated price sources, and the scenario calculation. Nine calculated indirect items bring the schedule to 115 lines.
+- `cost-estimate.html` and `cost-estimate.js` display A–F totals, low/expected/high ranges, apartment interiors, green premium/payback, source register, Excel-compatible CSV/clipboard exports and a savings calculator. No external JavaScript dependencies are required by the cost page.
+- Base unit rates are net of VAT. The estimate adds VAT once and shows explicit contingency, escalation and financing bases. Unquoted allowances are identified; source listings are not firm tenders.
+- Run `node verify-cost.mjs` from the repository root. Run `node 3d-model/verify-site.mjs` for scene checks (requires Three.js CDN access or a local r128 file argument).
+- The older Python/OBJ/JSON export and the viewer's 4,176 m² civil plot remain legacy design references, **not cost take-off sources**. The older project description below is historical and does not override this revised cost brief.
+
+---
+
 # 🏗️ Green Apartment Building — Interactive 3D Model
 
 > **Circular Economy ECON330 — Design Charrette (HW2)**  

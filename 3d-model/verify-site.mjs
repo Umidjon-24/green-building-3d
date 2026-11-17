@@ -31,6 +31,9 @@ vm.runInContext(`
 for(const name of ['civil-site.js','building.js']) vm.runInContext(await fs.readFile(new URL(name,root),'utf8'),context,{filename:name});
 vm.runInContext(`
     assert.equal(BUILDING.floors,5);
+    assert.equal(greenRoofGroup.children.length,2); // waterproof roof and schematic lift overrun, no plants
+    assert(greenRoofGroup.children.every(o=>o.geometry.type==='BoxGeometry'));
+    assert(featureData.greenroof.desc.includes('removed'));
     assert.equal(Object.keys(civilFeatures).length,8);
     assert.equal(Object.keys(featureData).length,16);
     assert.equal(siteGroups.trees.children.length,13);

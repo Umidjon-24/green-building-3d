@@ -1,6 +1,12 @@
 {
   "rewrites": [
+    { "source": "/cost", "destination": "/cost-estimate.html" },
     { "source": "/", "destination": "/3d-model/index.html" },
-    { "source": "/(.*)", "destination": "/3d-model/$1" }
+    { "source": "/index.html", "destination": "/3d-model/index.html" },
+    { "source": "/building.js", "destination": "/3d-model/building.js" },
+    { "source": "/civil-site.js", "destination": "/3d-model/civil-site.js" },
+    { "source": "/building_specs.json", "destination": "/3d-model/building_specs.json" },
+    { "source": "/green_building.obj", "destination": "/3d-model/green_building.obj" },
+    { "source": "/building.mtl", "destination": "/3d-model/building.mtl" }
   ]
 }

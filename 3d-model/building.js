@@ -37,15 +37,9 @@ const featureData = {
         ]
     },
     greenroof: {
-        title: "🌱 Extensive Green Roof",
-        desc: "Sedum and drought-resistant local plant cover over waterproof membrane. Reduces urban heat island effect, provides insulation (R-2.5 added), manages stormwater, and extends roof lifespan by 2×.",
-        stats: [
-            ["Coverage", "~250 m²"],
-            ["Substrate Depth", "80-120 mm"],
-            ["Cooling Effect", "3-5°C reduction"],
-            ["Stormwater Retained", "60-70%"],
-            ["Added Insulation", "R-2.5"]
-        ]
+        title: "Insulated Roof — No Rooftop Planting",
+        desc: "An insulated, waterproof flat roof retains the passive thermal envelope and space for solar PV. Rooftop soil and vegetation have been removed from the revised design. Coordinate drainage, maintenance routes and the elevator overrun.",
+        stats: [["Planting", "Removed"], ["Roof", "Insulated + waterproofed"], ["Solar", "30 kW concept array"], ["Elevator", "One five-stop lift budgeted"]]
     },
     courtyard: {
         title: "🌳 Central Courtyard",
@@ -583,63 +577,22 @@ function createSinglePanel(panelMat, frameMat, w, h) {
 // GREEN ROOF
 // ============================================================
 function createGreenRoof() {
+    // Legacy feature key retained for existing menu/test compatibility; no vegetation.
     greenRoofGroup = new THREE.Group();
-    greenRoofGroup.name = 'greenroof';
-
-    const roofY = BUILDING.totalHeight;
-
-    // Green roof on back connecting block
-    const greenMat = new THREE.MeshStandardMaterial({
-        color: 0x558B2F,
-        roughness: 0.95,
-        metalness: 0.0
-    });
-    const substrateMat = new THREE.MeshStandardMaterial({
-        color: 0x5D4037,
-        roughness: 0.9
-    });
-
-    // Substrate layer
-    const subGeo = new THREE.BoxGeometry(BUILDING.width - 2, 0.12, BUILDING.depth / 2 - 1);
-    const substrate = new THREE.Mesh(subGeo, substrateMat);
-    substrate.position.set(0, roofY + 0.06, -BUILDING.depth / 2);
-    greenRoofGroup.add(substrate);
-
-    // Vegetation patches (varied greens)
-    const greens = [0x558B2F, 0x689F38, 0x7CB342, 0x4CAF50, 0x66BB6A];
-    for (let i = 0; i < 25; i++) {
-        const patchSize = 1.5 + Math.random() * 3;
-        const patchGeo = new THREE.BoxGeometry(patchSize, 0.08 + Math.random() * 0.06, patchSize);
-        const patchMat = new THREE.MeshStandardMaterial({
-            color: greens[Math.floor(Math.random() * greens.length)],
-            roughness: 0.95
-        });
-        const patch = new THREE.Mesh(patchGeo, patchMat);
-        patch.position.set(
-            -BUILDING.width / 2 + 2 + Math.random() * (BUILDING.width - 4),
-            roofY + 0.15 + Math.random() * 0.05,
-            -BUILDING.depth / 2 - BUILDING.depth / 8 + Math.random() * (BUILDING.depth / 2 - 2)
-        );
-        patch.castShadow = true;
-        greenRoofGroup.add(patch);
-    }
-
-    // Small roof plants (spheres)
-    for (let i = 0; i < 15; i++) {
-        const plantGeo = new THREE.SphereGeometry(0.2 + Math.random() * 0.3, 6, 5);
-        const plantMat = new THREE.MeshStandardMaterial({
-            color: greens[Math.floor(Math.random() * greens.length)],
-            roughness: 0.9
-        });
-        const plant = new THREE.Mesh(plantGeo, plantMat);
-        plant.position.set(
-            -BUILDING.width / 2 + 3 + Math.random() * (BUILDING.width - 6),
-            roofY + 0.25,
-            -BUILDING.depth / 2 - 1 + Math.random() * (BUILDING.depth / 3)
-        );
-        greenRoofGroup.add(plant);
-    }
-
+    greenRoofGroup.name = 'roof';
+    const roof = new THREE.Mesh(
+        new THREE.BoxGeometry(BUILDING.width, 0.16, BUILDING.depth / 2),
+        new THREE.MeshStandardMaterial({ color: 0xd4c9b8, roughness: 0.85 })
+    );
+    roof.position.set(0, BUILDING.totalHeight + 0.08, -BUILDING.depth / 2);
+    roof.receiveShadow = true;
+    greenRoofGroup.add(roof);
+    // Schematic MRL lift overrun; final shaft/headroom dimensions require supplier design.
+    const overrun = new THREE.Mesh(new THREE.BoxGeometry(2.6, 1.8, 2.6),
+        new THREE.MeshStandardMaterial({color: 0xd4c9b8, roughness: 0.85}));
+    overrun.position.set(6, BUILDING.totalHeight + 0.9, -7);
+    overrun.castShadow = true;
+    greenRoofGroup.add(overrun);
     scene.add(greenRoofGroup);
 }
 
