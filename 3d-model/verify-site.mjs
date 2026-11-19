@@ -37,6 +37,26 @@ vm.runInContext(`
     assert.equal(Object.keys(featureData).length,16);
     assert.equal(siteGroups.trees.children.length,13);
     scene.updateMatrixWorld(true);
+    const panels = solarPanels.children.filter(o=>o.name==='PV module');
+    const thermal = solarPanels.children.filter(o=>o.name==='Hot-water collector');
+    assert.equal(panels.length * 500,30000);
+    assert.equal(thermal.length * 4,20);
+    const bounds = o=>new THREE.Box3().setFromObject(o);
+    const obstructions = [greenRoofGroup.children[1],ventilationGroup.children[0]].map(bounds);
+    const checked = [];
+    for (const rack of solarPanels.children) {
+        const extent = bounds(rack);
+        const normal = new THREE.Vector3(0,1,0).transformDirection(rack.children[0].matrixWorld);
+        assert(normal.y>0 && normal.z>0 && Math.abs(normal.x)<1e-9);
+        assert(checked.concat(obstructions).every(box=>!box.intersectsBox(extent)));
+        checked.push(extent);
+        if (rack.name==='PV module') {
+            assert(extent.min.x>=-17 && extent.max.x<=17 && (extent.max.x<=-5 || extent.min.x>=5));
+            assert(extent.min.z>=-6 && extent.max.z<=6);
+        } else {
+            assert(extent.min.z>=-10.5 && extent.max.z<=-7);
+        }
+    }
     let meshes=0;
     scene.traverse(o=>{if(o.isMesh){meshes++;assert(o.geometry);assert(Number.isFinite(o.position.x));}});
     assert(meshes>500);

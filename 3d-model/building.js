@@ -30,9 +30,11 @@ BUILDING.totalHeight = BUILDING.floors * BUILDING.floorHeight;
 const featureData = {
     solar: {
         title: "☀️ Rooftop Solar Panels",
-        desc: "The concept array serves the building during daylight hours. Annual output assumes 1,500 kWh per installed kWp. Self-use depends on the electricity demand at the meter.",
+        desc: "Blue electricity panels face south on the two roof wings. The separate bronze-framed collectors on the rear roof heat water for taps and showers. Annual output assumes 1,500 kWh per installed kWp. Self-use depends on the electricity demand at the meter.",
         stats: [
-            ["Design capacity", "30 kWp"],
+            ["Concept PV layout", "60 × 500 W = 30 kWp"],
+            ["PV orientation", "Due south · 15° tilt"],
+            ["Solar hot water", "20 m² of collectors"],
             ["Estimated annual output", "45,000 kWh"],
             ["Assumed on-site use", "70% of output"]
         ]
@@ -423,75 +425,51 @@ function createSolarPanels() {
     solarPanels = new THREE.Group();
     solarPanels.name = 'solar';
 
-    const panelMat = new THREE.MeshStandardMaterial({
-        color: 0x1A237E,
-        roughness: 0.15,
-        metalness: 0.8,
-    });
-    const framePanelMat = new THREE.MeshStandardMaterial({
-        color: 0x808080,
-        roughness: 0.3,
-        metalness: 0.7
-    });
-
-    const roofY = BUILDING.totalHeight + 0.2;
-    const panelW = 1.7;
-    const panelH = 1.0;
-    const tiltAngle = -15 * Math.PI / 180; // Tilted south
-
-    // Panels on left wing roof
-    for (let row = 0; row < 4; row++) {
-        for (let col = 0; col < 6; col++) {
-            const panel = createSinglePanel(panelMat, framePanelMat, panelW, panelH);
-            panel.position.set(
-                -BUILDING.width / 2 + BUILDING.depth / 2 - 5 + col * (panelW + 0.3),
-                roofY + 0.5 + Math.sin(-tiltAngle) * (panelH / 2),
-                -2 + row * (panelH + 0.5)
-            );
-            panel.rotation.x = tiltAngle;
-            solarPanels.add(panel);
+    const frame = new THREE.MeshStandardMaterial({color:0x9ba7ad, roughness:0.55, metalness:0.45});
+    const pv = new THREE.MeshStandardMaterial({color:0x253e7d, roughness:0.34, metalness:0.32});
+    const absorber = new THREE.MeshStandardMaterial({color:0x494037, roughness:0.55});
+    const bronze = new THREE.MeshStandardMaterial({color:0xa67648, roughness:0.5});
+    // +Z is south. Raising the north edge turns the upper surface toward +Z.
+    const tilt = THREE.MathUtils.degToRad(15);
+    function addRack(name, x, roofY, z, width, depth, faceMaterial, rimMaterial) {
+        const rack = new THREE.Group();
+        rack.name = name;
+        rack.position.set(x, roofY, z);
+        const deck = new THREE.Group();
+        deck.rotation.x = tilt;
+        deck.position.y = 0.24 + depth * Math.sin(tilt) / 2;
+        const rim = new THREE.Mesh(new THREE.BoxGeometry(width+0.06,0.06,depth+0.06),rimMaterial);
+        const face = new THREE.Mesh(new THREE.BoxGeometry(width,0.025,depth),faceMaterial);
+        face.position.y = 0.04;
+        face.castShadow = face.receiveShadow = rim.castShadow = true;
+        deck.add(rim,face);
+        rack.add(deck);
+        for (const side of [-1,1]) {
+            const offset = side * depth * 0.36;
+            const height = deck.position.y - offset * Math.sin(tilt) - 0.03;
+            const support = new THREE.Mesh(new THREE.BoxGeometry(width*0.72,height,0.065),frame);
+            support.position.set(0,height/2,offset*Math.cos(tilt));
+            rack.add(support);
         }
+        solarPanels.add(rack);
     }
 
-    // Panels on right wing roof
-    for (let row = 0; row < 4; row++) {
-        for (let col = 0; col < 6; col++) {
-            const panel = createSinglePanel(panelMat, framePanelMat, panelW, panelH);
-            panel.position.set(
-                BUILDING.width / 2 - BUILDING.depth / 2 - 5 + col * (panelW + 0.3),
-                roofY + 0.5 + Math.sin(-tiltAngle) * (panelH / 2),
-                -2 + row * (panelH + 0.5)
-            );
-            panel.rotation.x = tiltAngle;
-            solarPanels.add(panel);
+    const wingX = (BUILDING.width - BUILDING.depth) / 2;
+    const wingRoof = BUILDING.totalHeight + 0.26;
+    for (const center of [-wingX,wingX]) {
+        for (let row = 0; row < 6; row++) {
+            for (let col = 0; col < 5; col++) {
+                addRack('PV module',center+(col-2)*2.24,wingRoof,(row-2.5)*1.96,
+                    2.04,1.13,pv,frame);
+            }
         }
     }
-
+    // Separate 20 m² of thermal aperture on the rear strip, away from the lift and stair vent.
+    for (let col = 0; col < 5; col++) {
+        addRack('Hot-water collector',-15+col*2.25,BUILDING.totalHeight+0.16,
+            -8.85,2,2,absorber,bronze);
+    }
     scene.add(solarPanels);
-}
-
-function createSinglePanel(panelMat, frameMat, w, h) {
-    const group = new THREE.Group();
-    
-    // Panel surface
-    const panelGeo = new THREE.BoxGeometry(w, 0.04, h);
-    const panel = new THREE.Mesh(panelGeo, panelMat);
-    panel.castShadow = true;
-    group.add(panel);
-
-    // Frame
-    const frameGeo = new THREE.BoxGeometry(w + 0.06, 0.06, h + 0.06);
-    const frame = new THREE.Mesh(frameGeo, frameMat);
-    frame.position.y = -0.026;
-    group.add(frame);
-
-    // Support leg
-    const legGeo = new THREE.BoxGeometry(0.05, 0.6, 0.05);
-    const leg = new THREE.Mesh(legGeo, frameMat);
-    leg.position.set(0, -0.3, h / 3);
-    group.add(leg);
-
-    return group;
 }
 
 // ============================================================
@@ -740,7 +718,8 @@ function createVentilationIndicators() {
     // Stack ventilation tower on roof (stairwell)
     const towerGeo = new THREE.BoxGeometry(2, 2.5, 2);
     const tower = new THREE.Mesh(towerGeo, ventMat);
-    tower.position.set(0, BUILDING.totalHeight + 1.25, -BUILDING.depth / 4);
+    const ventZ = -BUILDING.depth / 4 - 1.5;
+    tower.position.set(0, BUILDING.totalHeight + 1.25, ventZ);
     tower.castShadow = true;
     ventilationGroup.add(tower);
 
@@ -748,7 +727,7 @@ function createVentilationIndicators() {
     const slatMat = new THREE.MeshStandardMaterial({ color: 0x546E7A, roughness: 0.3, metalness: 0.6 });
     for (let i = 0; i < 4; i++) {
         const slat = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.08, 0.01), slatMat);
-        slat.position.set(0, BUILDING.totalHeight + 0.5 + i * 0.5, -BUILDING.depth / 4 + 1.01);
+        slat.position.set(0, BUILDING.totalHeight + 0.5 + i * 0.5, ventZ + 1.01);
         slat.rotation.x = 0.3;
         ventilationGroup.add(slat);
     }
@@ -952,16 +931,6 @@ function setTimeOfDay(minutes) {
 function animate() {
     animationId = requestAnimationFrame(animate);
     controls.update();
-
-    // Subtle building idle animation — gentle rotation
-    const time = Date.now() * 0.0001;
-
-    // Solar panel shimmer
-    if (solarPanels) {
-        solarPanels.children.forEach((panel, i) => {
-            // Subtle metallic reflection shimmer
-        });
-    }
 
     renderer.render(scene, camera);
 }
