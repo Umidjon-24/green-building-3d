@@ -35,6 +35,17 @@ for(let mask=0;mask<32;mask++){
   if(opts.land) assert.equal(e.land,0);
   if(opts.grey) near(e.items.filter(r=>['C23','C24'].includes(r.id)).reduce((a,r)=>a+r.total,0),0);
 }
+// Reconcile the overview comparator to the detailed expected green premium.
+const traditional=estimate(1,{traditional:true});
+near(expected.direct-traditional.direct,greenRows().reduce((total,row)=>total+row[1]-row[2],0));
+for (const [scenario,green] of scenarios.entries()) {
+  const other=estimate(scenario,{traditional:true});
+  near(catTotal(green,'D'),catTotal(other,'D'));
+  near(other.land,green.land);
+  assert(other.vat<green.vat && other.finance<green.finance);
+  assert(other.total<green.total);
+  near(Object.keys(COST.categories).reduce((sum,c)=>sum+catTotal(other,c),0),other.total);
+}
 const csv=csvRows();assert.equal(csv.length,116);
 csv.forEach(row=>assert.equal(row.length,csv[0].length));
 assert(Math.abs(csv.slice(1).reduce((a,row)=>a+row[12],0)-expected.total)<.02, 'CSV cent rounding must reconcile within two cents');

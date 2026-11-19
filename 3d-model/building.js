@@ -27,13 +27,11 @@ BUILDING.totalHeight = BUILDING.floors * BUILDING.floorHeight;
 const featureData = {
     solar: {
         title: "☀️ Rooftop Solar Panels",
-        desc: "30 kW photovoltaic array on south-facing roof slope. Generates ~45,000 kWh/year in Uzbekistan's high solar irradiance (5.5 kWh/m²/day). Covers ~60% of common area electricity and reduces CO₂ by 22 tonnes/year.",
+        desc: "The concept array serves the building during daylight hours. Annual output assumes 1,500 kWh per installed kWp. Self-use depends on the electricity demand at the meter.",
         stats: [
-            ["Capacity", "30 kW"],
-            ["Annual Output", "~45,000 kWh"],
-            ["Panel Area", "180 m²"],
-            ["CO₂ Reduction", "22 t/year"],
-            ["Payback Period", "6-8 years"]
+            ["Design capacity", "30 kWp"],
+            ["Estimated annual output", "45,000 kWh"],
+            ["Assumed on-site use", "70% of output"]
         ]
     },
     greenroof: {
@@ -54,32 +52,27 @@ const featureData = {
     },
     water: {
         title: "💧 Rainwater Harvesting & Greywater Recycling",
-        desc: "Roof-collected rainwater stored in underground cistern for irrigation and toilet flushing. Greywater from sinks/showers treated via biofilter for landscape irrigation. Reduces municipal water use by 35%.",
+        desc: "A cistern collects roof runoff for non-potable use. Treated greywater supplies landscape irrigation. The cost model assumes the following annual reuse volumes.",
         stats: [
-            ["Cistern Volume", "15,000 L"],
-            ["Annual Rainfall Captured", "~85,000 L"],
-            ["Greywater Recycled", "~40%"],
-            ["Water Savings", "35% reduction"],
-            ["Irrigation Coverage", "100% of landscape"]
+            ["Cistern capacity", "15,000 L"],
+            ["Rainwater used", "85 m³/year"],
+            ["Greywater used", "250 m³/year"]
         ]
     },
     insulation: {
         title: "🧱 Thermal Mass & Insulation",
-        desc: "400mm fired clay brick walls with 100mm mineral wool insulation (R-3.5). High thermal mass stores daytime heat for cold nights and keeps interiors cool during summer days. Triple-glazed windows on north face.",
+        desc: "The cost plan assumes aerated concrete block walls with external insulation and double glazing. The concrete floors provide thermal mass.",
         stats: [
-            ["Wall R-Value", "R-3.5 (m²·K/W)"],
-            ["Brick Thickness", "400 mm"],
-            ["Insulation", "100 mm mineral wool"],
-            ["Windows", "Double/Triple glazed"],
-            ["U-Value (windows)", "1.1 W/m²·K"]
+            ["Block thickness", "300 mm"],
+            ["Facade insulation", "100 mm"],
+            ["Glazing", "Double-glazed PVC"]
         ]
     },
     ventilation: {
         title: "💨 Natural Cross-Ventilation",
-        desc: "Stack-effect ventilation through central stairwell with operable roof vents. Cross-ventilation via opposed windows on N/S facades. Reduces cooling energy by 40% during spring/autumn shoulder seasons.",
+        desc: "Stack-effect ventilation through central stairwell with operable roof vents. Cross-ventilation via opposed windows on N/S facades. Cooler night air can remove heat stored during the day.",
         stats: [
             ["Strategy", "Cross + Stack ventilation"],
-            ["Cooling Savings", "~40% reduction"],
             ["Vent Area", "5% of floor area"],
             ["Night Purge", "Automated louvers"],
             ["Air Changes", "4-6 ACH (natural)"]
@@ -126,7 +119,7 @@ function init() {
 
     // ---- Scene ----
     scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x87CEEB, 0.003);
+    scene.fog = new THREE.FogExp2(0xc8d9de, 0.003);
 
     // ---- Camera ----
     camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 500);
@@ -179,13 +172,13 @@ function setupLighting(mode) {
     scene.children.filter(c => c.isLight).forEach(l => scene.remove(l));
 
     if (mode === 'day') {
-        scene.background = new THREE.Color(0x87CEEB);
-        scene.fog = new THREE.FogExp2(0x87CEEB, 0.003);
+        scene.background = new THREE.Color(0xc8d9de);
+        scene.fog = new THREE.FogExp2(0xc8d9de, 0.003);
 
-        ambientLight = new THREE.AmbientLight(0x7ec8e3, 0.5);
+        ambientLight = new THREE.AmbientLight(0xf3eee5, 0.40);
         scene.add(ambientLight);
 
-        hemisphereLight = new THREE.HemisphereLight(0x87CEEB, 0x556B2F, 0.6);
+        hemisphereLight = new THREE.HemisphereLight(0xc8d9de, 0x827766, 0.65);
         scene.add(hemisphereLight);
 
         directionalLight = new THREE.DirectionalLight(0xFFF8E1, 1.2);
@@ -203,8 +196,8 @@ function setupLighting(mode) {
         renderer.toneMappingExposure = 1.0;
 
     } else if (mode === 'sunset') {
-        scene.background = new THREE.Color(0xFF6B35);
-        scene.fog = new THREE.FogExp2(0xFF8C42, 0.004);
+        scene.background = new THREE.Color(0xd99e82);
+        scene.fog = new THREE.FogExp2(0xd99e82, 0.004);
 
         ambientLight = new THREE.AmbientLight(0xFFB347, 0.3);
         scene.add(ambientLight);
@@ -262,74 +255,69 @@ function createBuilding() {
     buildingGroup = new THREE.Group();
     buildingGroup.name = 'building';
 
-    // Materials
-    const brickMat = new THREE.MeshStandardMaterial({
-        color: 0xB8734A,   // Uzbek fired brick
-        roughness: 0.85,
-        metalness: 0.02
-    });
-    const brickMat2 = new THREE.MeshStandardMaterial({
-        color: 0xC4804F,  // lighter accent brick
-        roughness: 0.82,
-        metalness: 0.02
-    });
-    const concreteMat = new THREE.MeshStandardMaterial({
-        color: 0xD4C9B8,
-        roughness: 0.7,
-        metalness: 0.05
-    });
-    const windowMat = new THREE.MeshStandardMaterial({
-        color: 0x6BA3BE,
-        roughness: 0.1,
-        metalness: 0.6,
-        transparent: true,
-        opacity: 0.7
-    });
-    const frameMat = new THREE.MeshStandardMaterial({
-        color: 0xF5F0E8,
-        roughness: 0.5,
-        metalness: 0.3
-    });
-    const balconyMat = new THREE.MeshStandardMaterial({
-        color: 0xD4C4A8,
-        roughness: 0.65,
-        metalness: 0.1
-    });
-
-    // U-Shape Building (two wings + connecting block)
-    // Left wing
-    const leftWing = createWing(brickMat, -BUILDING.width / 2 + BUILDING.depth / 2, 0, 0,
-        BUILDING.depth, BUILDING.totalHeight, BUILDING.depth);
-    buildingGroup.add(leftWing);
-
-    // Right wing  
-    const rightWing = createWing(brickMat, BUILDING.width / 2 - BUILDING.depth / 2, 0, 0,
-        BUILDING.depth, BUILDING.totalHeight, BUILDING.depth);
-    buildingGroup.add(rightWing);
-
-    // Back connecting block
-    const backBlock = createWing(brickMat2, 0, 0, -BUILDING.depth / 2,
-        BUILDING.width, BUILDING.totalHeight, BUILDING.depth / 2);
-    buildingGroup.add(backBlock);
-
-    // Add windows to all facades
-    addWindows(windowMat, frameMat);
-
-    // Add balconies on south facade
-    addBalconies(balconyMat, concreteMat);
-
-    // Floor slabs visible between floors (concrete bands)
-    for (let f = 1; f <= BUILDING.floors; f++) {
-        const slabGeo = new THREE.BoxGeometry(BUILDING.width + 0.6, 0.15, BUILDING.depth + 0.6);
-        const slab = new THREE.Mesh(slabGeo, concreteMat);
-        slab.position.y = f * BUILDING.floorHeight;
-        slab.castShadow = true;
-        buildingGroup.add(slab);
+    // A staggered fired-brick bond. Each texture tile spans two metres of wall.
+    const canvas = document.createElement('canvas');
+    canvas.width = canvas.height = 256;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#b99b81';
+    ctx.fillRect(0, 0, 256, 256);
+    const brickTones = ['#af7658', '#b78061', '#be8968', '#b57c5c', '#b98164'];
+    for (let row = 0; row < 16; row++) {
+        for (let col = -1; col < 8; col++) {
+            ctx.fillStyle = brickTones[(row * 7 + (col + 1) * 3 + row * (col + 1)) % brickTones.length];
+            ctx.fillRect(col * 32 + (row % 2) * 16, row * 16, 31, 15);
+        }
     }
+    const bond = new THREE.CanvasTexture(canvas);
+    bond.wrapS = bond.wrapT = THREE.RepeatWrapping;
+    bond.encoding = THREE.sRGBEncoding;
+    const brick = new THREE.MeshStandardMaterial({map: bond, roughness: 0.92});
+    const limestone = new THREE.MeshStandardMaterial({color: 0xe1d6be, roughness: 0.78});
+    const bronze = new THREE.MeshStandardMaterial({color: 0x584d42, roughness: 0.54, metalness: 0.22});
+    const glazing = new THREE.MeshStandardMaterial({color: 0x456c75, roughness: 0.25, metalness: 0.18});
+    const halfWidth = BUILDING.width / 2;
+    const wingDepth = BUILDING.depth;
+    const wingX = halfWidth - wingDepth / 2;
+    const rearDepth = wingDepth / 4;
+    const recessWidth = BUILDING.width - 2 * wingDepth;
+    const rearZ = -wingDepth / 2 - rearDepth / 2;
+    const eaves = BUILDING.totalHeight;
+
+    function block(width, height, depth, x, y, z, material) {
+        const geometry = new THREE.BoxGeometry(width, height, depth);
+        if (material === brick) {
+            const {uv, normal, position} = geometry.attributes;
+            for (let i = 0; i < uv.count; i++) {
+                const u = Math.abs(normal.getX(i)) > 0.5 ? position.getZ(i) : position.getX(i);
+                uv.setXY(i, u / 2, position.getY(i) / 2);
+            }
+        }
+        const part = new THREE.Mesh(geometry, material);
+        part.position.set(x, y, z);
+        part.castShadow = part.receiveShadow = true;
+        buildingGroup.add(part);
+    }
+
+    // Split the rear volume at the wing corners to avoid overlapping facades.
+    block(BUILDING.width, eaves, rearDepth, 0, eaves / 2, rearZ, brick);
+    block(recessWidth, eaves, rearDepth, 0, eaves / 2, -wingDepth * 3 / 8, brick);
+    for (const x of [-wingX, wingX]) {
+        block(wingDepth, eaves, wingDepth, x, eaves / 2, 0, brick);
+        block(wingDepth + 0.14, 0.48, wingDepth + 0.14, x, 0.24, 0, limestone);
+        for (let floor = 1; floor <= BUILDING.floors; floor++) {
+            block(wingDepth + 0.32, 0.15, wingDepth + 0.3, x, floor * BUILDING.floorHeight, 0, limestone);
+        }
+        block(wingDepth + 0.24, 0.22, wingDepth + 0.24, x, eaves + 0.15, 0, limestone);
+    }
+    // A glazed ground-floor vestibule connects the canopy to the recessed rear lobby.
+    block(4.2, 2.95, wingDepth * 0.75, 0, 1.475, wingDepth / 8, glazing);
+    block(4.5, 0.16, wingDepth * 0.75, 0, 2.99, wingDepth / 8, limestone);
+    addWindows(glazing, bronze, limestone);
+    addBalconies(bronze, limestone);
 
     // Entrance canopy
     const canopyGeo = new THREE.BoxGeometry(8, 0.2, 4);
-    const canopy = new THREE.Mesh(canopyGeo, concreteMat);
+    const canopy = new THREE.Mesh(canopyGeo, limestone);
     canopy.position.set(0, BUILDING.floorHeight - 0.3, BUILDING.depth / 2 + 2);
     canopy.castShadow = true;
     canopy.receiveShadow = true;
@@ -354,7 +342,7 @@ function createBuilding() {
 
     // Decorative Uzbek-style arched entrance detail
     const archGeo = new THREE.TorusGeometry(1.5, 0.15, 8, 16, Math.PI);
-    const archMat = new THREE.MeshStandardMaterial({ color: 0x1565C0, roughness: 0.4, metalness: 0.3 });
+    const archMat = new THREE.MeshStandardMaterial({ color: 0x26766d, roughness: 0.4, metalness: 0.3 });
     const arch = new THREE.Mesh(archGeo, archMat);
     arch.position.set(0, 2.8, BUILDING.depth / 2 + 0.15);
     buildingGroup.add(arch);
@@ -363,86 +351,52 @@ function createBuilding() {
     scene.add(buildingGroup);
 }
 
-function createWing(material, x, y, z, width, height, depth) {
-    const group = new THREE.Group();
-    const geo = new THREE.BoxGeometry(width, height, depth);
-    const mesh = new THREE.Mesh(geo, material);
-    mesh.position.set(x, height / 2, z);
-    mesh.castShadow = true;
-    mesh.receiveShadow = true;
-    group.add(mesh);
-    return group;
-}
-
-function addWindows(windowMat, frameMat) {
-    const windowW = 1.4;
-    const windowH = 1.8;
-    const windowGeo = new THREE.PlaneGeometry(windowW, windowH);
-    const frameGeo = new THREE.BoxGeometry(windowW + 0.2, windowH + 0.2, 0.08);
-
-    // South facade windows (front - both wings)
-    for (let f = 0; f < BUILDING.floors; f++) {
-        const yPos = f * BUILDING.floorHeight + BUILDING.floorHeight * 0.55;
-        
-        // Left wing - south face
-        for (let w = 0; w < 3; w++) {
-            const xPos = -BUILDING.width / 2 + BUILDING.depth / 2 - 4 + w * 3;
-            addWindowPair(xPos, yPos, BUILDING.depth / 2 + 0.01, windowGeo, frameGeo, windowMat, frameMat, 0);
+function addWindows(glazing, frame, limestone) {
+    // Batch repeated glazing, reveals, mullions and projecting sills by material.
+    const pieces = new Map([[glazing, []], [frame, []], [limestone, []]]);
+    const transform = new THREE.Object3D();
+    function windowAt(x, y, z, angle, balconyDoor = false) {
+        function piece(material, width, height, depth, u, v, offset) {
+            transform.position.set(x + Math.cos(angle) * u + Math.sin(angle) * offset,
+                y + v, z - Math.sin(angle) * u + Math.cos(angle) * offset);
+            transform.rotation.y = angle;
+            transform.scale.set(width, height, depth);
+            transform.updateMatrix();
+            pieces.get(material).push(transform.matrix.clone());
         }
-        // Right wing - south face
-        for (let w = 0; w < 3; w++) {
-            const xPos = BUILDING.width / 2 - BUILDING.depth / 2 - 4 + w * 3;
-            addWindowPair(xPos, yPos, BUILDING.depth / 2 + 0.01, windowGeo, frameGeo, windowMat, frameMat, 0);
-        }
-        // Center windows above entrance (floors 1+)
-        if (f >= 1) {
-            for (let w = -1; w <= 1; w++) {
-                addWindowPair(w * 3, yPos, BUILDING.depth / 2 + 0.01, windowGeo, frameGeo, windowMat, frameMat, 0);
-            }
-        }
-        
-        // North facade (back)
-        for (let w = 0; w < 10; w++) {
-            const xPos = -BUILDING.width / 2 + 2 + w * 3.5;
-            addWindowPair(xPos, yPos, -BUILDING.depth / 2 - BUILDING.depth / 4 - 0.01, windowGeo, frameGeo, windowMat, frameMat, Math.PI);
-        }
-
-        // East facade
-        for (let w = 0; w < 3; w++) {
-            const zPos = -BUILDING.depth / 2 + 2.5 + w * 4;
-            addWindowSide(BUILDING.width / 2 + 0.01, yPos, zPos, windowGeo, frameGeo, windowMat, frameMat, -Math.PI / 2);
-        }
-
-        // West facade
-        for (let w = 0; w < 3; w++) {
-            const zPos = -BUILDING.depth / 2 + 2.5 + w * 4;
-            addWindowSide(-BUILDING.width / 2 - 0.01, yPos, zPos, windowGeo, frameGeo, windowMat, frameMat, Math.PI / 2);
-        }
+        const h = balconyDoor ? 2.5 : 1.72;
+        const center = balconyDoor ? -0.37 : 0;
+        piece(frame, 1.92, h + 0.18, 0.16, 0, center, 0.08);
+        piece(glazing, 1.73, h, 0.035, 0, center, 0.17);
+        piece(frame, 0.055, h, 0.05, -0.24, center, 0.20);
+        piece(frame, 1.73, 0.055, 0.05, 0, center + h * 0.27, 0.20);
+        piece(limestone, 2.08, 0.10, 0.35, 0, center - h / 2 - 0.12, 0.13);
     }
-}
 
-function addWindowPair(x, y, z, windowGeo, frameGeo, windowMat, frameMat, rotY) {
-    const win = new THREE.Mesh(windowGeo, windowMat);
-    win.position.set(x, y, z);
-    win.rotation.y = rotY;
-    buildingGroup.add(win);
-
-    const frame = new THREE.Mesh(frameGeo, frameMat);
-    frame.position.set(x, y, z + (rotY === 0 ? 0.04 : -0.04));
-    frame.rotation.y = rotY;
-    buildingGroup.add(frame);
-}
-
-function addWindowSide(x, y, z, windowGeo, frameGeo, windowMat, frameMat, rotY) {
-    const win = new THREE.Mesh(windowGeo, windowMat);
-    win.position.set(x, y, z);
-    win.rotation.y = rotY;
-    buildingGroup.add(win);
-
-    const frame = new THREE.Mesh(frameGeo, frameMat);
-    frame.position.set(x + (rotY < 0 ? 0.04 : -0.04), y, z);
-    frame.rotation.y = rotY;
-    buildingGroup.add(frame);
+    const front = BUILDING.depth / 2;
+    const side = BUILDING.width / 2;
+    for (let floor = 0; floor < BUILDING.floors; floor++) {
+        const y = floor * BUILDING.floorHeight + BUILDING.floorHeight * 0.55;
+        for (const sign of [-1, 1]) {
+            const wing = sign * (side - front);
+            for (let bay = 0; bay < 3; bay++) {
+                windowAt(wing - 4 + bay * 3, y, front, 0, floor > 0 && bay === 1);
+                windowAt(sign * side, y, -front + 2.5 + bay * 4, sign * Math.PI / 2);
+            }
+            for (const z of [0, 4.2]) {
+                windowAt(sign * (side - BUILDING.depth), y, z, -sign * Math.PI / 2);
+            }
+            if (floor > 0) windowAt(sign * 2, y, -front / 2, 0);
+        }
+        for (let bay = 0; bay < 10; bay++) windowAt(-side + 2 + bay * 3.5, y, -front * 1.5, Math.PI);
+    }
+    const unitBox = new THREE.BoxGeometry(1, 1, 1);
+    pieces.forEach((matrices, material) => {
+        const batch = new THREE.InstancedMesh(unitBox, material, matrices.length);
+        matrices.forEach((matrix, index) => batch.setMatrixAt(index, matrix));
+        batch.castShadow = batch.receiveShadow = true;
+        buildingGroup.add(batch);
+    });
 }
 
 function addBalconies(balconyMat, concreteMat) {
@@ -452,12 +406,12 @@ function addBalconies(balconyMat, concreteMat) {
         
         // Left wing balconies
         const b1 = createBalcony(balconyMat, concreteMat);
-        b1.position.set(-BUILDING.width / 2 + BUILDING.depth / 2, yPos, BUILDING.depth / 2 + 1.5);
+        b1.position.set(-BUILDING.width / 2 + BUILDING.depth / 2, yPos, BUILDING.depth / 2 + 1);
         buildingGroup.add(b1);
 
         // Right wing balconies
         const b2 = createBalcony(balconyMat, concreteMat);
-        b2.position.set(BUILDING.width / 2 - BUILDING.depth / 2, yPos, BUILDING.depth / 2 + 1.5);
+        b2.position.set(BUILDING.width / 2 - BUILDING.depth / 2, yPos, BUILDING.depth / 2 + 1);
         buildingGroup.add(b2);
     }
 }
@@ -473,13 +427,13 @@ function createBalcony(balconyMat, concreteMat) {
     group.add(slab);
 
     // Railing
-    const railMat = new THREE.MeshStandardMaterial({ color: 0x5D4037, roughness: 0.5, metalness: 0.4 });
+    const railMat = balconyMat;
     // Front rail
     const frontRail = new THREE.Mesh(new THREE.BoxGeometry(6, 0.06, 0.06), railMat);
     frontRail.position.set(0, 1.1, 1);
     group.add(frontRail);
     // Railing posts
-    for (let i = -2.5; i <= 2.5; i += 1) {
+    for (let i = -3; i <= 3; i += 0.375) {
         const post = new THREE.Mesh(new THREE.BoxGeometry(0.05, 1.1, 0.05), railMat);
         post.position.set(i, 0.55, 1);
         group.add(post);
@@ -561,7 +515,7 @@ function createSinglePanel(panelMat, frameMat, w, h) {
     // Frame
     const frameGeo = new THREE.BoxGeometry(w + 0.06, 0.06, h + 0.06);
     const frame = new THREE.Mesh(frameGeo, frameMat);
-    frame.position.y = -0.01;
+    frame.position.y = -0.026;
     group.add(frame);
 
     // Support leg
@@ -767,7 +721,7 @@ function createShadingDevices() {
             // East fins
             [-0.9, 0.9].forEach(offset => {
                 const fin = new THREE.Mesh(
-                    new THREE.BoxGeometry(0.04, 2, 0.4),
+                    new THREE.BoxGeometry(0.46, 2, 0.09),
                     finMat
                 );
                 fin.position.set(BUILDING.width / 2 + 0.2, yPos, zPos + offset);
@@ -777,7 +731,7 @@ function createShadingDevices() {
             // West fins
             [-0.9, 0.9].forEach(offset => {
                 const fin = new THREE.Mesh(
-                    new THREE.BoxGeometry(0.04, 2, 0.4),
+                    new THREE.BoxGeometry(0.46, 2, 0.09),
                     finMat
                 );
                 fin.position.set(-BUILDING.width / 2 - 0.2, yPos, zPos + offset);

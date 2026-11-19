@@ -18,41 +18,26 @@
         }
         canvas { display: block; }
         
-        /* Info Panel */
-        #info-panel {
+        #budget-link {
             position: absolute;
             top: 20px;
             left: 20px;
-            background: rgba(16, 42, 67, 0.92);
-            backdrop-filter: blur(12px);
-            color: #e0e0e0;
-            padding: 24px;
-            border-radius: 16px;
-            max-width: 360px;
-            border: 1px solid rgba(76, 175, 80, 0.3);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            z-index: 10;
-            transition: transform 0.3s ease;
-        }
-        #info-panel h1 {
-            font-size: 1.3em;
-            color: #4CAF50;
-            margin-bottom: 4px;
-            display: flex;
+            z-index: 11;
+            display: inline-flex;
             align-items: center;
-            gap: 8px;
+            min-height: 44px;
+            padding: 10px 16px;
+            border-radius: 10px;
+            border: 1px solid #588876;
+            background: #143e38;
+            color: #f3fff7;
+            font-weight: 650;
+            text-decoration: none;
+            box-shadow: 0 3px 14px #102a4326;
         }
-        #info-panel .subtitle {
-            font-size: 0.82em;
-            color: #90CAF9;
-            margin-bottom: 14px;
-        }
-        #info-panel p {
-            font-size: 0.85em;
-            line-height: 1.55;
-            color: #b0bec5;
-        }
-        
+        #budget-link:hover { background: #215447; }
+        #budget-link:focus-visible { outline: 3px solid #90caf9; outline-offset: 3px; }
+
         /* Feature Labels */
         #feature-panel {
             position: absolute;
@@ -161,6 +146,9 @@
             font-size: 1.2em;
         }
 
+        .feature-basis { margin-top: 12px; }
+        .feature-basis a { color: #a5d9b5; }
+
         /* Day/Night Toggle */
         #time-toggle {
             position: absolute;
@@ -220,36 +208,41 @@
         button:focus-visible { outline: 3px solid #90caf9; outline-offset: 3px; }
         #feature-detail { max-height: 48vh; overflow-y: auto; }
         #feature-detail .close-btn { background: transparent; border: none; }
-        #plan-key { display: none; position: absolute; left: 20px; top: 20px; max-width: 355px; padding: 15px; border: 1px solid #577c70; border-radius: 14px; background: rgba(16,42,67,.94); color: #dce8df; z-index: 10; font-size: 11px; line-height: 1.8; }
+        #plan-key { display: none; position: absolute; left: 20px; top: 74px; max-width: 355px; padding: 15px; border: 1px solid #577c70; border-radius: 14px; background: rgba(16,42,67,.94); color: #dce8df; z-index: 10; font-size: 11px; line-height: 1.8; }
         #plan-key strong, #plan-key span, #plan-key small { display: block; }
         .swatch { display: inline-block; width: 12px; height: 7px; margin: 0 4px; }
         .swatch.planting { background: #7f9161; } .swatch.paving { background: #c4b89e; }
         .swatch.irrigation { background: #2196f3; } .swatch.runoff { background: #167c80; }
         .site-plan #plan-key { display: block; }
-        .site-plan #info-panel { display: none; }
         .site-plan #feature-detail { top: 190px; transform: none; right: 15px; max-width: 270px; padding: 18px; }
         @media (max-width: 1050px) {
-            #info-panel { max-width: 270px; padding: 16px; }
-            #time-toggle { top: 170px; left: 20px; transform: none; }
+            #time-toggle { top: 74px; left: 20px; transform: none; }
             .time-btn { padding: 6px 12px; }
-            .site-plan #time-toggle { top: 172px; }
+            .site-plan #time-toggle { top: 210px; }
         }
         @media (max-width: 650px) {
-            #info-panel { top: 10px; left: 10px; max-width: calc(100% - 20px); padding: 12px; }
-            #info-panel h1 { font-size: 16px; } #info-panel p { display: none; }
-            #info-panel .subtitle { margin-bottom: 0; font-size: 10px; }
-            #controls-panel { top: 90px; right: 10px; padding: 8px; }
-            #controls-panel > h3, #controls-panel > div:not(#view-toggle):not(:has(a)) { display: none; }
-            #time-toggle { top: 97px; left: 10px; }
+            .viewer-tools {
+                position: absolute; inset: 10px 10px auto; z-index: 10;
+                display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+                pointer-events: none;
+            }
+            .viewer-tools > #budget-link, .viewer-tools > #time-toggle,
+            .viewer-tools > #controls-panel, .viewer-tools > #plan-key {
+                position: static; pointer-events: auto;
+            }
+            #budget-link { order: 0; }
+            #controls-panel { order: 1; padding: 3px; }
+            #controls-panel > h3, #controls-panel > div:not(#view-toggle) { display: none; }
+            #controls-panel #view-toggle { margin: 0; }
+            .view-btn { padding: 8px 10px; }
+            #time-toggle { order: 2; }
             .time-btn { padding: 6px 8px; }
             #feature-panel { bottom: 10px; max-height: 23vh; gap: 4px; }
             .feature-btn { font-size: 11px; padding: 7px 9px; }
             #feature-detail, .site-plan #feature-detail { top: 145px; right: 10px; max-width: 270px; max-height: 36vh; transform: none; padding: 16px; }
-            #plan-key { top: 10px; left: 10px; max-width: calc(100% - 20px); padding: 8px; font-size: 10px; }
+            #plan-key { order: 3; max-width: 100%; padding: 8px; font-size: 10px; }
             #plan-key small { display: none; }
-            .site-plan #controls-panel { top: 115px; }
-            .site-plan #time-toggle { top: 122px; }
-            .site-plan #feature-detail { top: 170px; }
+            .site-plan #feature-detail { top: 212px; }
         }
     </style>
 </head>
@@ -261,16 +254,8 @@
     </div>
 
     <div id="canvas-container">
-        <!-- Info Panel -->
-        <div id="info-panel">
-            <h1>🌿 Green Apartment Building</h1>
-            <div class="subtitle">Sustainable Housing for Uzbekistan's Regional Cities</div>
-            <p>
-                A 5-story, 40-unit apartment building with one elevator, designed for
-                Uzbekistan's continental climate. Features passive solar design, 
-                local materials, and circular economy principles. Rooftop planting is removed.
-            </p>
-        </div>
+        <div class="viewer-tools">
+        <a id="budget-link" href="../cost-estimate.html">Cost estimate &amp; budget</a>
 
         <!-- Day/Night Toggle -->
         <div id="time-toggle">
@@ -286,11 +271,19 @@
             <div><kbd>Right Click</kbd> + Drag → Pan</div>
             <div><kbd>Scroll</kbd> → Zoom</div>
             <div>Click features below to highlight</div>
-            <div><a href="/cost-estimate.html" style="color:#a5d9b5;font-weight:600">Cost estimate &amp; budget</a></div>
             <div id="view-toggle" role="group" aria-label="Camera view">
                 <button class="view-btn" id="perspective-view" aria-pressed="true" onclick="showPerspective()">3D View</button>
                 <button class="view-btn" id="site-view" aria-pressed="false" onclick="showSitePlan()">Site Plan</button>
             </div>
+        </div>
+
+        <div id="plan-key" aria-label="Site drawing legend">
+            <strong>CIVIL / LANDSCAPE · CONCEPT PLAN</strong>
+            <span>North up · assumed 72 × 58 m plot</span>
+            <span><i class="swatch planting"></i>Mulched planting <i class="swatch paving"></i>Permeable pavers</span>
+            <span><i class="swatch irrigation"></i>Rainwater → drip irrigation <i class="swatch runoff"></i>Runoff → rain garden</span>
+            <small>Concept layout; soil, drainage and local access requirements to be verified.</small>
+        </div>
         </div>
 
         <!-- Feature Buttons -->
@@ -331,19 +324,13 @@
             <button class="feature-btn" data-feature="parking" onclick="highlightFeature('parking')">P Parking</button>
             <button class="feature-btn" data-feature="waste" onclick="highlightFeature('waste')">♻ Waste &amp; Composting</button>
         </div>
-        <div id="plan-key" aria-label="Site drawing legend">
-            <strong>CIVIL / LANDSCAPE · CONCEPT PLAN</strong>
-            <span>North up · 72 × 58 m plot · dimensions in metres</span>
-            <span><i class="swatch planting"></i>Mulched planting <i class="swatch paving"></i>Permeable pavers</span>
-            <span><i class="swatch irrigation"></i>Rainwater → drip irrigation <i class="swatch runoff"></i>Runoff → rain garden</span>
-            <small>Concept layout; soil, drainage and local access requirements to be verified.</small>
-        </div>
         <!-- Feature Detail Popup -->
         <div id="feature-detail" role="region" aria-label="Feature details" aria-live="polite">
             <button class="close-btn" aria-label="Close feature details" onclick="closeDetail()">&times;</button>
             <h3 id="detail-title"></h3>
             <p id="detail-desc"></p>
             <div id="detail-stats"></div>
+            <p class="feature-basis">Design quantities and performance figures are concept assumptions. <a href="../cost-estimate.html#sources">View cost sources</a></p>
         </div>
     </div>
 

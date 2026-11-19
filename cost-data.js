@@ -135,10 +135,23 @@ const COST = {
   ]
 };
 
+// Assumed net USD/unit for a conventional building of the same size and layout.
+const traditionalExpectedRates = {
+  A13:28, B17:10, B18:70, B23:0, B26:0, B27:0, B28:0,
+  C05:180, C11:0, C19:0, C20:0, C21:0, C22:0, C23:0, C24:0,
+  E01:25, E02:25, E03:10, E04:200, E05:0, E06:4.5, E12:600
+};
 function estimate(scenario=1, options={}) {
   const items=COST.rows.map(r=>({id:r[0],cat:r[0][0],name:r[1],qty:r[2],unit:r[3],rate:r[4][scenario],rates:r[4],basis:r[5],confidence:r[6],sources:r[7],note:r[8],total:r[2]*r[4][scenario]}));
   // Optional scope decisions are all explicit, mutually compatible, and applied before indirects.
   for(const i of items) {
+    if(options.traditional && Object.hasOwn(traditionalExpectedRates, i.id)) {
+      const scenarioFactor=i.rates[scenario]/i.rates[1];
+      i.rate=traditionalExpectedRates[i.id]*scenarioFactor;
+      i.basis='E';
+      i.sources=['QS'];
+      i.note='Traditional specification allowance, scaled by the corresponding trade rate scenario.';
+    }
     if(options.land && i.id==='A01') {i.qty=0;i.note+=' Publicly provided land: zero cash acquisition; economic value excluded.';}
     if(options.grey && ['C23','C24'].includes(i.id)) i.qty=0;
     if(options.solarhot && i.id==='C11') i.qty=0;

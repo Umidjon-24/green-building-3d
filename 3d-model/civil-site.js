@@ -37,32 +37,65 @@ function siteLine(group, points, color, radius = 0.055) {
         group.add(mesh);
     }
 }
-function groundLabel(group, text, x, z, width, y = 0.24) {
-    const canvas = document.createElement('canvas'); canvas.width = 768; canvas.height = 96;
+function groundLabel(group, text, x, z, width, y = 0.24, primary = false) {
+    const canvas = document.createElement('canvas'); canvas.width = Math.max(100, text.length * 45 + 48); canvas.height = 96;
     const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#102a43'; ctx.fillRect(0, 0, 768, 96);
-    ctx.fillStyle = '#ecf5e9'; ctx.font = '600 38px Segoe UI, sans-serif';
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, 384, 48, 736);
+    ctx.fillStyle = primary ? '#23483e' : '#fffdf4'; ctx.fillRect(0, 0, canvas.width, 96);
+    ctx.fillStyle = primary ? '#fffdf4' : '#233c34'; ctx.font = 'bold 64px Segoe UI, sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, canvas.width / 2, 46, canvas.width - 22);
     const texture = new THREE.CanvasTexture(canvas); texture.encoding = THREE.sRGBEncoding;
-    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(width, width / 8), new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide, toneMapped: false }));
+    const annotation = group === planLabels;
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(width, width * 96 / canvas.width), new THREE.MeshBasicMaterial({ map: texture, toneMapped: false, depthTest: !annotation, depthWrite: !annotation }));
+    if (annotation) mesh.renderOrder = 10;
     mesh.rotation.x = -Math.PI / 2; mesh.position.set(x, y, z); group.add(mesh); return mesh;
 }
+let paverTexture;
 function pavers(group, x, z, w, d, color = 0xc4b89e) {
-    siteBox(group, x, 0.08, z, w, 0.12, d, color);
-    // Fine joints express a permeable modular surface without hundreds of blocks.
-    for (let dx = -w / 2 + 1; dx < w / 2; dx += 1)
-        siteBox(group, x + dx, 0.145, z, 0.025, 0.012, d, 0x8c927e);
-    for (let dz = -d / 2 + 1; dz < d / 2; dz += 1)
-        siteBox(group, x, 0.145, z + dz, w, 0.012, 0.025, 0x8c927e);
+    if (!paverTexture) {
+        const tile = document.createElement('canvas'); tile.width = tile.height = 256;
+        const ctx = tile.getContext('2d');
+        ctx.fillStyle = '#bcb7aa'; ctx.fillRect(0, 0, 256, 256);
+        const tones = ['#fffefa','#f5f3ec','#eae8e1','#faf9f5'];
+        for (let row = 0; row < 4; row++) {
+            for (let col = -1; col < 2; col++) {
+                ctx.fillStyle = tones[(row * 3 + (col + 2) % 2) % 4];
+                ctx.fillRect(128 * col + 64 * (row % 2) + 2, 64 * row + 2, 124, 60);
+            }
+        }
+        paverTexture = new THREE.CanvasTexture(tile);
+        paverTexture.wrapS = paverTexture.wrapT = THREE.RepeatWrapping;
+        paverTexture.encoding = THREE.sRGBEncoding;
+    }
+    const surface = new THREE.PlaneGeometry(w, d);
+    surface.rotateX(-Math.PI / 2);
+    const vertices = surface.attributes.position, uv = surface.attributes.uv;
+    for (let i = 0; i < uv.count; i++) uv.setXY(i, (vertices.getX(i) + x) / 2, (vertices.getZ(i) + z) / 2);
+    const material = siteMaterial(color); material.map = paverTexture;
+    const mesh = new THREE.Mesh(surface, material);
+    // Keep the dedicated pedestrian route continuous across the courtyard.
+    mesh.position.set(x, group === siteGroups.access ? 0.15 : 0.14, z);
+    mesh.receiveShadow = true; group.add(mesh);
 }
 function planting(group, x, z, w, d) {
-    siteBox(group, x, 0.08, z, w, 0.12, d, 0x998469);
-    for (let ix = -w / 2 + 0.65; ix < w / 2; ix += 1.4) {
-        for (let iz = -d / 2 + 0.65; iz < d / 2; iz += 1.4) {
-            const plant = new THREE.Mesh(new THREE.SphereGeometry(0.34, 6, 4), siteMaterial(0x7f9161));
-            plant.scale.y = 0.65; plant.position.set(x + ix, 0.35, z + iz); group.add(plant);
+    siteBox(group, x, 0.07, z, w, 0.12, d, 0x86735a);
+    const rows = Math.max(1, Math.floor(d / 0.95)), cols = Math.max(1, Math.floor(w / 0.95));
+    const shrubs = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 0), siteMaterial(0xffffff), rows * cols);
+    const pose = new THREE.Object3D(), color = new THREE.Color();
+    const palette = [0x6d8451,0x84965e,0x60784e,0xa0ab72];
+    let index = 0;
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            const phase = row * 1.7 + col * 2.8;
+            const size = 0.47 + 0.08 * Math.sin(phase);
+            pose.position.set((col + 0.5) * w / cols - w / 2 + 0.12 * Math.sin(phase), 0.34,
+                (row + 0.5) * d / rows - d / 2 + 0.1 * Math.cos(phase));
+            pose.scale.set(size, size * 0.74, size * 0.9);
+            pose.rotation.y = phase; pose.updateMatrix();
+            shrubs.setMatrixAt(index, pose.matrix);
+            shrubs.setColorAt(index++, color.setHex(palette[(Math.floor(row / 3) + col) % palette.length]));
         }
     }
+    shrubs.position.set(x, 0, z); shrubs.receiveShadow = true; group.add(shrubs);
 }
 function bench(group, x, z, rotation = 0) {
     const g = new THREE.Group(); group.add(g); g.position.set(x, 0.15, z); g.rotation.y = rotation;
@@ -105,20 +138,48 @@ function createSiteLandscape() {
     planting(landscapeGroup, -16, 22, 4, 12);
 }
 
+function createPlanAnnotations() {
+    const ink = 0x304d44;
+    planLabels = new THREE.Group(); scene.add(planLabels); planLabels.visible = false;
+    const paper = new THREE.Mesh(new THREE.PlaneGeometry(900,900), new THREE.MeshBasicMaterial({color:0xefeee6, toneMapped:false}));
+    paper.rotation.x = -Math.PI / 2; paper.position.y = -0.07; planLabels.add(paper);
+
+    // Dimension lines align with the plot corners; gaps keep the figures legible.
+    const marks = [
+        [-36,-25,-3,-25], [3,-25,36,-25], [-36,-26,-36,-22.5], [36,-26,36,-22.5],
+        [-39,-22,-39,5], [-39,9,-39,36], [-40,-22,-36.5,-22], [-40,36,-36.5,36],
+        [39,-16,39,-21], [39,-21,38,-18.8], [39,-21,40,-18.8],
+    ];
+    const points = marks.flatMap(([x1,z1,x2,z2]) => [new THREE.Vector3(x1,0.22,z1),new THREE.Vector3(x2,0.22,z2)]);
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    planLabels.add(new THREE.LineSegments(geometry, new THREE.LineBasicMaterial({color:ink})));
+    groundLabel(planLabels, 'N', 39,-23,1.8);
+    groundLabel(planLabels, '72 m', 0,-25,4.8);
+    groundLabel(planLabels, '58 m', -39,7,4.8);
+    [
+        ['5 STOREYS / 40 HOMES',0,-6,23,19,true], ['Entrance',0,10.8,7],
+        ['Bikes',-11,10.8,4.5], ['Play',-5.5,23,4.3], ['Community courtyard',0,28,16,0.24,true],
+        ['Shade trees',-28,28,9], ['Parking · 6 bays',28,6,12], ['Rain garden',23,30.8,9],
+        ['Sort + compost',-20,26.5,10], ['Drip irrigation',10,24.6,9], ['Bus stop',-6,36,6.5]
+    ].forEach(a => groundLabel(planLabels,...a));
+    // Alternating five-metre segments stay to scale at every zoom.
+    siteBox(planLabels,-24,0.2,39,5,0.05,0.45,ink);
+    siteBox(planLabels,-19,0.2,39,5,0.05,0.45,0xf4eee0);
+    groundLabel(planLabels,'0',-26.5,40.6,1.3);
+    groundLabel(planLabels,'5',-21.5,40.6,1.3);
+    groundLabel(planLabels,'10 m',-16.5,40.6,3.4);
+}
+
 function createCivilSite() {
     Object.assign(featureData, civilFeatures);
     // The courtyard's original menu item follows the new, visible community space.
     featureData.courtyard = { ...civilFeatures.community, title: 'Central Courtyard' };
     featureData.landscape = { ...civilFeatures.trees, title: 'Sustainable Landscaping' };
     const plot = siteGroup('site');
-    siteBox(plot, 0, -0.015, SITE.centerZ, SITE.width, 0.05, SITE.depth, 0xb8aa8b);
+    siteBox(plot, 0, -0.015, SITE.centerZ, SITE.width, 0.05, SITE.depth, 0xb5be90);
     siteLine(plot, [[-36,0.2,-22],[36,0.2,-22],[36,0.2,36],[33,0.2,36]], 0x315f54, 0.10);
     siteLine(plot, [[27,0.2,36],[1,0.2,36]], 0x315f54, 0.10);
     siteLine(plot, [[-1,0.2,36],[-36,0.2,36],[-36,0.2,-22]], 0x315f54, 0.10);
-    // North arrow lies in the ground plane and points to -Z.
-    siteLine(plot, [[-31,0.25,-13],[-31,0.25,-18],[-32,0.25,-16]], 0x23483f, 0.12);
-    siteLine(plot, [[-31,0.25,-18],[-30,0.25,-16]], 0x23483f, 0.12);
-    groundLabel(plot, 'N', -31, -20, 2.5);
 
     const paths = siteGroup('access');
     pavers(paths, 0, 23, 2, 30); // Sidewalk to entrance: clear, direct, step-free.
@@ -183,12 +244,7 @@ function createCivilSite() {
     siteBox(waste,-20,0.85,22.1,5.2,1.5,0.12,0x8a7555);
     siteBox(waste,-22.6,0.85,24,0.12,1.5,3.8,0x8a7555);
 
-    planLabels = new THREE.Group(); scene.add(planLabels); planLabels.visible = false;
-    [['5 STOREYS / 40 HOMES',0,-6,22,19],['ENTRANCE',0,10.8,8],['BIKES',-10,10,5],['PLAY',-5.5,24,5],['COMMUNITY COURTYARD',0,28,16],['SHADE TREES',-28,27,10],['PARKING / 6 BAYS',28,6,11],['RAIN GARDEN',22,30.8,9],['SORT + COMPOST',-20,26.5,10],['DRIP IRRIGATION',10,26,9],['BUS STOP',-6,36,7],['72 m',0,-23.7,6],['58 m',-38,7,5]].forEach(a => groundLabel(planLabels,...a));
-    // A true metre-based scale bar, independent of viewport zoom.
-    siteBox(planLabels,-24,0.2,39,5,0.05,0.4,0x102a43);
-    siteBox(planLabels,-19,0.2,39,5,0.05,0.4,0xf4eee0);
-    groundLabel(planLabels,'0       5       10 m',-21.5,40.5,11);
+    createPlanAnnotations();
     setupSiteInteraction();
 }
 

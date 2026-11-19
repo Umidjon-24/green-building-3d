@@ -31,33 +31,43 @@ function render(){
   document.getElementById('range-table').innerHTML=head(['Full scope','Low','Expected','High'])+'<tbody>'+[
     ['Development USD',...all.map(x=>usd(x.total))],['USD/m² GFA',...all.map(x=>usd(x.total/2900))],['USD/apartment',...all.map(x=>usd(x.total/40))],['Difference from target',...all.map(x=>(x.total>=COST.target?'+':'−')+usd(Math.abs(x.total-COST.target)))]]
     .map(r=>'<tr>'+r.map((v,i)=>cell(v,i>0)).join('')+'</tr>').join('')+'</tbody>';
+  const traditional=estimate(s,{traditional:true});
+  const comparison=document.getElementById('comparison-table');
+  comparison.innerHTML=`<caption>${names[s]} scenario · estimated costs in USD</caption>`+
+    head(['Cost category','Our Green building','Traditional building'])+
+    '<tbody>'+Object.entries(COST.categories).map(([key,label])=>
+      `<tr><th scope="row">${label}</th>${cell(usd(catTotal(e,key)),true)}${cell(usd(catTotal(traditional,key)),true)}</tr>`
+    ).join('')+'</tbody><tfoot><tr><th scope="row">Total development</th>'+
+    cell(usd(e.total),true)+cell(usd(traditional.total),true)+'</tr></tfoot>';
   const construction=e.works+e.items.find(r=>r.id==='F01').total;
   document.getElementById('scope-bridge').innerHTML=`<p><strong>Scope bridge (${names[s].toLowerCase()}):</strong> direct A–E ${usd(e.direct)} → works excluding land/permits ${usd(e.works)} → works plus site management ${usd(construction)} (${usd(construction/2900)}/m², before design/risk/VAT/finance) → complete development ${usd(e.total)}. Construction-only pricing and total development funding are different comparisons.</p>`;
   document.getElementById('detail-tables').innerHTML=Object.entries(COST.categories).map(([c,n])=>{
     const rows=e.items.filter(r=>r.cat===c);
-    return `<h3>${c}. ${n}</h3><div class="table-wrap"><table class="detail-table">${head(['ID','Item','Quantity / unit','Unit USD net','Unit UZS net','Total USD','Total UZS million','Low / expected / high USD totals','Evidence / confidence','Basis and calculation'])}<tbody>`+rows.map(r=>'<tr>'+cell(r.id)+cell(esc(r.name))+cell(fmt(r.qty,Number.isInteger(r.qty)?0:1)+' '+esc(r.unit))+cell(fmt(r.rate,2),true)+cell(fmt(r.rate*COST.fx),true)+cell(usd(r.total),true)+cell(fmt(r.total*COST.fx/1e6,2),true)+cell(all.map(x=>usd(x.items.find(y=>y.id===r.id).total)).join(' / '),true)+cell(`<span class="tag ${r.confidence.toLowerCase()}">${r.basis} · ${r.confidence}</span><br>${links(r.sources)}`)+cell(esc(r.note))+'</tr>').join('')+`</tbody><tfoot><tr><td colspan="5">${c} subtotal</td>${cell(usd(catTotal(e,c)),true)}${cell(fmt(catTotal(e,c)*COST.fx/1e6,2),true)}<td colspan="3"></td></tr></tfoot></table></div>`;
+    return `<h3>${c}. ${n}</h3><div class="table-wrap"><table class="detail-table">${head(['ID','Item','Quantity / unit','Unit USD net','Unit UZS net','Total USD','Total UZS million','Low / expected / high USD totals','Evidence / confidence','Basis and calculation'])}<tbody>`+rows.map(r=>'<tr>'+cell(r.id)+cell(esc(r.name))+cell(fmt(r.qty,Number.isInteger(r.qty)?0:1)+' '+esc(r.unit))+cell(fmt(r.rate,2),true)+cell(fmt(r.rate*COST.fx),true)+cell(usd(r.total),true)+cell(fmt(r.total*COST.fx/1e6,2),true)+cell(all.map(x=>usd(x.items.find(y=>y.id===r.id).total)).join(' / '),true)+cell(`<span class="tag ${r.confidence.toLowerCase()}">${r.basis==='A'?'Source-informed estimate':'Estimator assumption'} · ${r.confidence}</span><br>${links(r.sources)}`)+cell(esc(r.note))+'</tr>').join('')+`</tbody><tfoot><tr><td colspan="5">${c} subtotal</td>${cell(usd(catTotal(e,c)),true)}${cell(fmt(catTotal(e,c)*COST.fx/1e6,2),true)}<td colspan="3"></td></tr></tfoot></table></div>`;
   }).join('');
   const units=interiors(e);
   document.getElementById('unit-table').innerHTML=head(['Type','Units × net area','D interior / home','Shared D / home','D total / home','All type units total'])+'<tbody>'+units.map(u=>'<tr>'+cell(u.name)+cell(`${u.count} × ${u.area} m²`)+cell(usd(u.each),true)+cell(usd(u.shared),true)+cell(usd(u.each+u.shared),true)+cell(usd(u.total),true)+'</tr>').join('')+'</tbody><tfoot><tr><td colspan="5">Reconciles to D total (net of VAT)</td>'+cell(usd(units.reduce((a,u)=>a+u.total,0)),true)+'</tr></tfoot>';
 }
 
 function greenRows(){
-  const e=base(), sum=ids=>e.items.filter(r=>ids.includes(r.id)).reduce((a,r)=>a+r.total,0);
+  const e=base(), traditional=estimate(1,{traditional:true});
+  const sum=(ids,model=e)=>model.items.filter(r=>ids.includes(r.id)).reduce((a,r)=>a+r.total,0);
+  const baseline=(...ids)=>sum(ids,traditional);
   return [
     ['30 kW PV',sum(['B26','B27','B28']),0,'B26–28; no PV in comparator.','Load-dependent. Expected 70% self-use: about 5.2 years simple payback incl. capex VAT. See calculation below.'],
     ['Rooftop planting — removed',0,0,'B24–25 excluded at zero quantity.','No planted roof, extra structural load or roof-garden maintenance. Insulated weatherproof roof retained.'],
-    ['100 mm external insulation',sum(['B17']),1300*10,'Comparator 50 mm/basic system allowance at USD 10/m²; confirm minimum legal specification.','Passive package, assessed jointly below.'],
-    ['Improved double glazing',sum(['B18']),350*70,'Comparator basic double glazing at USD 70/m²; upgrade allowance USD 15/m².','Passive package; no separate additive saving claimed.'],
+    ['100 mm external insulation',sum(['B17']),baseline('B17'),'Comparator 50 mm/basic system allowance at USD 10/m²; confirm minimum legal specification.','Passive package, assessed jointly below.'],
+    ['Improved double glazing',sum(['B18']),baseline('B18'),'Comparator basic double glazing at USD 70/m²; upgrade allowance USD 15/m².','Passive package; no separate additive saving claimed.'],
     ['External sun shading',sum(['B23']),0,'Incremental external louvers; base balconies unchanged.','Passive package; reduce overheating first.'],
-    ['Cross/stack ventilation detailing',sum(['C05']),40*180,'Comparator basic ventilation USD 180/home; wet-room fans retained in both.','Passive package; no guaranteed 40% saving.'],
+    ['Cross/stack ventilation detailing',sum(['C05']),baseline('C05'),'Comparator basic ventilation USD 180/home; wet-room fans retained in both.','Passive package; no guaranteed 40% saving.'],
     ['Thermal mass / orientation',0,0,'RC structure already in B; orientation addressed in F02 design fee.','No extra material premium; savings depend on shading and night cooling.'],
     ['Rainwater collection + toilet reuse',sum(['C19','C20','C21','C22']),0,'Base roof drainage B22 remains in comparator.','USD ~22/year water avoided less USD 150 O&M: no positive utility payback.'],
     ['Greywater treatment + reuse',sum(['C23','C24']),0,'Full incremental system; irrigation demand capped.','250 m³ × 3,136 UZS ÷ FX ≈ USD 65/year, less USD 600 O&M: no positive payback.'],
     ['Solar hot-water loop',sum(['C11']),0,'Backup storage/boiler retained in both; no duplicated DHW plant.','~65 years simple payback at assumed general gas tariff; weak affordability case.'],
-    ['Permeable parking / paths / courtyard',sum(['A13','E01','E02']),200*28+550*25,'Comparator 200 m² parking at USD 28 and 550 m² paving at USD 25.','Drainage and repair benefits; no monetized lifecycle saving without runoff design.'],
-    ['Drought planting + drip',sum(['E03','E06']),900*(10+4.5),'Comparator irrigated lawn/planting at USD 10/m² plus irrigation USD 4.5/m².','USD 2,700 assumed initial saving; no further water savings added to reuse claims.'],
-    ['Shade / fruit trees',sum(['E04','E05']),2400,'Comparator modest landscaping allowance USD 2,400.','Comfort and shade; no separate cooling saving added to passive package.'],
-    ['Waste sorting + compost',sum(['E12']),600,'Comparator ordinary bin point USD 600.','No verified collection-charge saving; shared amenity and circularity value.'],
+    ['Permeable parking / paths / courtyard',sum(['A13','E01','E02']),baseline('A13','E01','E02'),'Comparator 200 m² parking at USD 28 and 550 m² paving at USD 25.','Drainage and repair benefits; no monetized lifecycle saving without runoff design.'],
+    ['Drought planting + drip',sum(['E03','E06']),baseline('E03','E06'),'Comparator irrigated lawn/planting at USD 10/m² plus irrigation USD 4.5/m².','USD 2,700 assumed initial saving; no further water savings added to reuse claims.'],
+    ['Shade / fruit trees',sum(['E04','E05']),baseline('E04','E05'),'Comparator modest landscaping allowance USD 2,400.','Comfort and shade; no separate cooling saving added to passive package.'],
+    ['Waste sorting + compost',sum(['E12']),baseline('E12'),'Comparator ordinary bin point USD 600.','No verified collection-charge saving; shared amenity and circularity value.'],
     ['Courtyard / community equipment',0,0,'Same common space in comparator; full cost remains E01, E07–09 and E13–15.','Shared space avoids a facility in every apartment; no unsupported cash saving.'],
     ['Local/recycled materials',0,0,'Local AAC/tiles already priced; no assumed discount for uncertified recycled structural materials.','Repairability and reduced transport are qualitative benefits until procurement confirms savings.']
   ];
