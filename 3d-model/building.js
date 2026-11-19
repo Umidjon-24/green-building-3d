@@ -61,6 +61,8 @@ const featureData = {
         stats: [
             ["Rain tank capacity", "15,000 L"],
             ["Rainwater used", "85 m³/year"],
+            ["Greywater tank exterior", "12.8 m³ (schematic)"],
+            ["Greywater working capacity", "To be sized"],
             ["Greywater used", "250 m³/year"]
         ]
     },

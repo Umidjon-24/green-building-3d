@@ -9,7 +9,7 @@ const captures = [
  ['summer-shading','envelope','summer','Summer shade at a south window','The projecting horizontal shade intercepts a high summer ray before it reaches the glass.'],
  ['heating-cooling-traditional','heating','traditional','Traditional heating and ventilation','Gas boilers feed radiators and a shared hot-water tank. Apartment extract fans remove moisture.'],
  ['heating-cooling-green','heating','green','Heating and hot water in the green design','Boilers feed radiators. A separate roof collector loop supplies heat to domestic hot-water storage.'],
- ['water-system','water','','Two tanks and three water networks','Cyan: potable supply. Blue: roof runoff to toilets. Green: shower and basin water to garden drip lines.'],
+ ['water-system','water','','Two tanks and three water networks','Blue: 15 m³ rain tank. Green: 12.8 m³ greywater unit exterior (working capacity pending). Cyan: potable supply.'],
  ['circular-materials-exploded','circular','building','The structure stays while facade parts are repaired','The five-storey frame retains its footprint. Facade layers and window units are offset for illustration.'],
  ['construction-process','construction','3','Concrete frame, enclosure and rooftop services','The cutaway leaves part of the frame exposed. Individual bays and installation sequence are illustrative.'],
  ['solar-roof-layout','solar','','Two solar systems on one roof','Sixty south-facing PV modules supply electricity. Five separate collectors heat water.'],

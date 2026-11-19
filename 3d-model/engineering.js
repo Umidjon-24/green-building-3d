@@ -143,8 +143,8 @@ function waterDetail(g) {
     part(g,-5.55,4.05,-.85,2.0,.16,3.75,P.dark);
     vessel(g,-2.85,-.55,.1,1.18,1.72,P.rain);
     vessel(g,-2.85,.36,.1,1.21,.12,0x7995a0);
-    vessel(g,2.75,-.56,.1,1.0,1.7,P.grey);
-    vessel(g,2.75,.34,.1,1.03,.12,0x739a72);
+    part(g,2.75,-.56,.1,3.2,1.6,2.5,P.grey);
+    part(g,2.75,.28,.1,3.2,.08,2.5,0x739a72);
     path3(g,[[-4.66,4.12,.88],[-4.66,-.76,.88],[-2.85,-.76,.88]],P.rain,.09);
     path3(g,[[-2.85,-.40,.65],[-1.22,-.40,.65],[-1.22,.85,.65]],P.rain,.08);
     // WC, washbasin and tap shown above the cut.
@@ -300,7 +300,7 @@ function setEngineeringMode(mode,option) {
         break;
     case 'water':
         mountEngineeringView(mode,waterDetail);
-        explanation='Separate underground tanks serve toilets and garden drip lines. The assumed annual reuse is 85 m³ of rainwater and 250 m³ of greywater. Buried locations and routes are illustrative.';break;
+        explanation='The rain tank stores 15 m³ for toilets. The greywater unit measures 3.2 × 2.5 × 1.6 m externally in the model (12.8 m³). Its working capacity still needs sizing. Estimated reuse is 85 m³/year for toilets and 250 m³/year for irrigation.';break;
     case 'circular':
         if(variant==='building'){view='exploded';mountEngineeringView(view,explodedBuilding);}
         else mountEngineeringView(mode,g=>envelopeDetail(g,.66,'summer'));break;
