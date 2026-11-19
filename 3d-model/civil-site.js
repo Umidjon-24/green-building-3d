@@ -342,8 +342,9 @@ function setSitePlan(enabled) {
     controls.update();
 }
 function showSitePlan() {
+    if(engineeringMode!=='full')setEngineeringMode('full');
     resetHighlight();document.getElementById('feature-detail').style.display='none';
     document.querySelectorAll('.feature-btn').forEach(b=>b.classList.remove('active'));
     setSitePlan(true);
 }
-function showPerspective() { closeDetail();setSitePlan(false); }
+function showPerspective() { if(engineeringMode!=='full')setEngineeringMode('full'); closeDetail();setSitePlan(false); }

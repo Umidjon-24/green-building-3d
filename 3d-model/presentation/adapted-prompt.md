@@ -1,0 +1,14 @@
+# Adapted implementation prompt — Green Apartments, Samarkand
+
+Continue the existing Three.js site in `3d-model/`. Use the Samarkand charrette’s five-storey, 40-apartment building, its established compass and its cost-page comparison. Preserve the site boundary, floor geometry, time slider, roof layout, feature controls, and cost and resource calculations.
+
+Add an **Energy Systems** selector with Architecture, Energy Envelope, Heating & Cooling, Solar, Water, Circular Materials, Construction, and Full Building. Give each technical view a suitable camera, physical equipment or fabric to inspect, a short explanation and a legend. Provide a reset to the full building.
+
+1. **Envelope.** Show a cutaway bay with 300 mm AAC, 100 mm external insulation, double glazing, a slab edge and a roof with 150 mm insulation. Show how a south-facing shade intercepts a high summer ray and allows a lower winter ray through the window. Use the traditional cost comparator for the simpler facade. Keep heat and sun arrows qualitative. Report thermal performance only where the source gives it.
+2. **Plant.** Show two shared concept gas boilers, radiators, supply and return pipes, shared hot-water storage, room access, open-window ventilation and local extraction. Compare the traditional gas plant with the green option that adds a 20 m² solar-thermal loop. Use diagrammatic equipment locations.
+3. **Solar.** Preserve the verified south-facing, 30 kWp rooftop PV layout, separate hot-water collectors, lift overrun and ventilation tower. Show electricity and solar hot water as separate systems.
+4. **Water.** Expose two independent vessels in an illustrative ground section. Connect roof runoff to the 15 m³ rain tank and toilets. Connect shower and basin drains to greywater treatment and drip irrigation. Give potable water its own pipe colour. Keep the cost model’s annual reuse assumptions of 85 m³ and 250 m³, respectively.
+5. **Circular materials and construction.** Show the retained concrete frame and the relationship between masonry infill, insulation, finish, windows and service access. Explode a detail and the principal facade layers along the five-storey footprint. Show construction in three stages. Explain component-level access and repair. The budget includes masonry partitions.
+6. **Deliverables.** Capture ten clean 16:9 views: envelope, wall assembly, summer shading, traditional plant, green plant, water, exploded building, construction sequence, existing roof layout and full building. Provide an image index identifying applicability, project source and illustrative assumptions.
+
+Use the current cost schedule and the live scene as the design basis. The original prompt’s three heights, S0/S1/S2, heat pumps and COP assumptions have no corresponding project case. Use the two cost specifications and single building height throughout.

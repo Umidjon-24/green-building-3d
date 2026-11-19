@@ -1,3 +1,7 @@
+## Engineering views
+
+In the 3D viewer, open **Energy Systems** to inspect the wall and roof cutaway, gas plant, separate water networks, facade layers and construction sequence. The [presentation image index](3d-model/presentation/README.md) links ten widescreen captures to their design assumptions and cost items.
+
 ## Revised cost plan — 17 November 2026
 
 Open `/cost` on Vercel, or `/cost-estimate.html` when serving the repository root locally. The viewer includes a **Cost estimate & budget** link.

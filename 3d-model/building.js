@@ -808,6 +808,7 @@ function createSurroundings() { createSiteStreet(); }
 
 
 function highlightFeature(featureName) {
+    if(engineeringMode!=='full')setEngineeringMode('full');
     // Reset previous highlight
     resetHighlight();
 
@@ -864,6 +865,7 @@ function highlightFeature(featureName) {
 function resetHighlight() { restoreFeatureMaterials(); currentHighlight=null; }
 
 function closeDetail() {
+    if(engineeringMode!=='full'){setEngineeringMode('full');return;}
     document.getElementById('feature-detail').style.display = 'none';
     resetHighlight();
     document.querySelectorAll('.feature-btn').forEach(btn => btn.classList.remove('active'));

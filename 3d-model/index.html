@@ -245,6 +245,22 @@
             #plan-key small { display: none; }
             .site-plan #feature-detail { top: 212px; }
         }
+        #systems { position:absolute; top:78px; left:20px; z-index:11; width:220px; padding:12px; color:#eef5ed; background:#153c35f5; border:1px solid #75998a; border-radius:12px; font-size:13px; }
+        #systems label { display:block; font-weight:650; margin-bottom:6px; }
+        #systems select, #systems button { font:inherit; border:1px solid #819c8c; border-radius:5px; }
+        #systems select { padding:5px; width:100%; background:#fffdf5; color:#19392c; }
+        #system-option:not([hidden]) { margin-top:5px; }
+        #systems button { margin-top:7px; padding:4px 9px; color:#fff; background:#285647; }
+        #system-notes { display:none; position:absolute; bottom:16px; left:20px; max-width:565px; padding:12px 16px; border-left:4px solid #71947e; color:#21382f; background:#fffdf6f5; z-index:9; font-size:14px; line-height:1.4; }
+        #system-title { font-size:18px; }
+        #system-legend { margin-top:4px; color:#476251; font-weight:600; }
+        .engineering-active #system-notes { display:block; }
+        .engineering-active #feature-panel, .section-view #time-toggle { display:none; }
+        .site-plan #systems { top:auto; bottom:20px; }
+        @media(max-width:1050px) and (min-width:651px){ #systems { top:125px; } }
+        @media(max-width:650px){ #systems,.site-plan #systems { position:static; pointer-events:auto; order:2; width:auto; max-width:100%; padding:4px 8px; }
+        #systems label {display:inline;font-size:11px;} #systems select {width:auto;max-width:160px;}
+        #systems button {margin:0;} #system-notes {font-size:12px;bottom:8px;left:8px;right:8px;} }
     </style>
 </head>
 <body>
@@ -267,6 +283,17 @@
             <button class="time-btn" onclick="setTimeOfDay(0)">Night</button>
         </div>
 
+        <section id="systems" aria-label="Engineering views">
+            <label for="system-mode">Energy Systems</label>
+            <select id="system-mode" onchange="setEngineeringMode(this.value)">
+                <option value="full">Full Building</option><option value="architecture">Architecture</option>
+                <option value="envelope">Energy Envelope</option><option value="heating">Heating &amp; Cooling</option>
+                <option value="solar">Solar</option><option value="water">Water</option>
+                <option value="circular">Circular Materials</option><option value="construction">Construction</option>
+            </select>
+            <select id="system-option" aria-label="View detail" hidden onchange="setEngineeringMode(engineeringMode,this.value)"></select>
+            <button onclick="resetEngineering()">Reset view</button>
+        </section>
         <!-- Controls -->
         <div id="controls-panel">
             <h3>🎮 Controls</h3>
@@ -289,6 +316,9 @@
         </div>
         </div>
 
+        <aside id="system-notes" aria-live="polite">
+            <h3 id="system-title"></h3><p id="system-explanation"></p><p id="system-legend"></p>
+        </aside>
         <!-- Feature Buttons -->
         <div id="feature-panel">
             <button class="feature-btn" onclick="highlightFeature('solar')">
@@ -350,6 +380,7 @@
 
     </script>
     <script src="civil-site.js"></script>
+    <script src="engineering.js"></script>
     <script src="building.js"></script>
 </body>
 </html>

@@ -27,7 +27,7 @@ vm.runInContext(`
     THREE.WebGLRenderer = class {constructor(){this.domElement=document.createElement('canvas');this.shadowMap={};}setSize(){}setPixelRatio(){}render(){}};
     THREE.OrbitControls = class {constructor(camera){this.object=camera;this.target=new THREE.Vector3();}update(){this.object.lookAt(this.target);}dispose(){}};
 `,context);
-for(const name of ['civil-site.js','building.js']) vm.runInContext(await fs.readFile(new URL(name,root),'utf8'),context,{filename:name});
+for(const name of ['civil-site.js','engineering.js','building.js']) vm.runInContext(await fs.readFile(new URL(name,root),'utf8'),context,{filename:name});
 vm.runInContext(`
     assert.equal(BUILDING.floors,5);
     assert.equal(greenRoofGroup.children.length,2); // waterproof roof and schematic lift overrun, no plants
@@ -91,6 +91,15 @@ vm.runInContext(`
     showPerspective();assert(camera.isPerspectiveCamera);assert(!planLabels.visible);assert.equal(planMode,false);
     highlightFeature('solar');highlightFeature('parking');closeDetail();
     assert.equal(savedMaterials.size,0);
+    for (const mode of Object.keys(engineering)) {
+        for(const [variant] of optionSets[mode]||[['']]) {
+            setEngineeringMode(mode,variant);
+            assert.equal(engineeringMode,mode);
+            if(engineeringLayer)assert(engineeringLayer.visible && engineeringLayer.children.length>2);
+        }
+    }
+    showSitePlan();assert(planMode && engineeringMode==='full' && buildingGroup.visible);
+    resetEngineering();assert(!planMode && solarPanels.visible && !engineeringLayer);
     console.log('PASS: scene geometry, 16 highlights twice, material restoration, camera round trip, 3 viewport ratios, Samarkand sun path and time control');
 `,context);
 assert(html.indexOf('civil-site.js')<html.indexOf('src="building.js"'));
