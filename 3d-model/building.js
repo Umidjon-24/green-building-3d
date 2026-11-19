@@ -8,7 +8,10 @@
 let scene, camera, renderer, controls;
 let buildingGroup, solarPanels, greenRoofGroup, courtyardGroup;
 let waterSystemGroup, insulationGroup, ventilationGroup, shadingGroup, landscapeGroup;
-let sun, ambientLight, directionalLight, hemisphereLight;
+let ambientLight, directionalLight, hemisphereLight;
+const windowLights = [];
+// Use the current calendar day at the site, independent of the viewer's timezone.
+const siteDate = new Date(Date.now() + 5 * 3600000);
 let animationId;
 let currentHighlight = null;
 
@@ -137,7 +140,7 @@ function init() {
     controls.update();
 
     // ---- Lighting ----
-    setupLighting('day');
+    setupLighting();
 
     // ---- Build the scene ----
     createGround();
@@ -167,81 +170,45 @@ function init() {
 // ============================================================
 // LIGHTING
 // ============================================================
-function setupLighting(mode) {
-    // Remove existing lights
-    scene.children.filter(c => c.isLight).forEach(l => scene.remove(l));
-
-    if (mode === 'day') {
-        scene.background = new THREE.Color(0xc8d9de);
-        scene.fog = new THREE.FogExp2(0xc8d9de, 0.003);
-
-        ambientLight = new THREE.AmbientLight(0xf3eee5, 0.40);
-        scene.add(ambientLight);
-
-        hemisphereLight = new THREE.HemisphereLight(0xc8d9de, 0x827766, 0.65);
-        scene.add(hemisphereLight);
-
-        directionalLight = new THREE.DirectionalLight(0xFFF8E1, 1.2);
-        directionalLight.position.set(30, 50, 20);
-        directionalLight.castShadow = true;
-        directionalLight.shadow.mapSize.set(2048, 2048);
-        directionalLight.shadow.camera.left = -50;
-        directionalLight.shadow.camera.right = 50;
-        directionalLight.shadow.camera.top = 50;
-        directionalLight.shadow.camera.bottom = -50;
-        directionalLight.shadow.camera.far = 120;
-        directionalLight.shadow.bias = -0.001;
-        scene.add(directionalLight);
-
-        renderer.toneMappingExposure = 1.0;
-
-    } else if (mode === 'sunset') {
-        scene.background = new THREE.Color(0xd99e82);
-        scene.fog = new THREE.FogExp2(0xd99e82, 0.004);
-
-        ambientLight = new THREE.AmbientLight(0xFFB347, 0.3);
-        scene.add(ambientLight);
-
-        hemisphereLight = new THREE.HemisphereLight(0xFF6347, 0x2F4F2F, 0.5);
-        scene.add(hemisphereLight);
-
-        directionalLight = new THREE.DirectionalLight(0xFF7F50, 1.5);
-        directionalLight.position.set(-40, 12, 5);
-        directionalLight.castShadow = true;
-        directionalLight.shadow.mapSize.set(2048, 2048);
-        directionalLight.shadow.camera.left = -50;
-        directionalLight.shadow.camera.right = 50;
-        directionalLight.shadow.camera.top = 50;
-        directionalLight.shadow.camera.bottom = -50;
-        directionalLight.shadow.camera.far = 120;
-        scene.add(directionalLight);
-
-        renderer.toneMappingExposure = 0.8;
-
-    } else if (mode === 'night') {
-        scene.background = new THREE.Color(0x0a0a2e);
-        scene.fog = new THREE.FogExp2(0x0a0a2e, 0.006);
-
-        ambientLight = new THREE.AmbientLight(0x1a1a4e, 0.3);
-        scene.add(ambientLight);
-
-        hemisphereLight = new THREE.HemisphereLight(0x0a0a4e, 0x000000, 0.2);
-        scene.add(hemisphereLight);
-
-        directionalLight = new THREE.DirectionalLight(0x4466AA, 0.3);
-        directionalLight.position.set(-20, 40, -30);
-        scene.add(directionalLight);
-
-        // Window glow lights
-        const windowLight1 = new THREE.PointLight(0xFFE4B5, 0.8, 30);
-        windowLight1.position.set(0, 8, 8);
-        scene.add(windowLight1);
-        const windowLight2 = new THREE.PointLight(0xFFE4B5, 0.6, 25);
-        windowLight2.position.set(0, 12, -8);
-        scene.add(windowLight2);
-
-        renderer.toneMappingExposure = 0.5;
+function setupLighting() {
+    scene.background = new THREE.Color();
+    ambientLight = new THREE.AmbientLight(0xf3eee5);
+    hemisphereLight = new THREE.HemisphereLight(0xc8d9de, 0x827766);
+    directionalLight = new THREE.DirectionalLight();
+    directionalLight.shadow.mapSize.set(2048, 2048);
+    Object.assign(directionalLight.shadow.camera, {left:-55, right:55, top:55, bottom:-55, near:1, far:180});
+    directionalLight.shadow.camera.updateProjectionMatrix();
+    directionalLight.shadow.bias = -0.0005;
+    scene.add(ambientLight, hemisphereLight, directionalLight);
+    for (const [x,y,z] of [[0,8,8],[0,12,-8]]) {
+        const light = new THREE.PointLight(0xffe4b5, 0, 30);
+        light.position.set(x,y,z);
+        windowLights.push(light);
+        scene.add(light);
     }
+    setTimeOfDay(720);
+}
+
+// Approximate solar declination and equation of time (NOAA fractional-year equations).
+// Samarkand: 39.65° N, 66.96° E, UTC+5. Model axes: east +X, up +Y, south +Z.
+function sunDirection(minutes, date) {
+    const year = date.getUTCFullYear();
+    const start = Date.UTC(year, 0, 1);
+    const yearDays = (Date.UTC(year + 1, 0, 1) - start) / 86400000;
+    const dayIndex = (Date.UTC(year, date.getUTCMonth(), date.getUTCDate()) - start) / 86400000;
+    const g = 2 * Math.PI * (dayIndex + minutes / 1440 - 0.5) / yearDays;
+    const correction = 229.18 * (0.000075 + 0.001868*Math.cos(g) - 0.032077*Math.sin(g)
+        - 0.014615*Math.cos(2*g) - 0.040849*Math.sin(2*g));
+    const decl = 0.006918 - 0.399912*Math.cos(g) + 0.070257*Math.sin(g)
+        - 0.006758*Math.cos(2*g) + 0.000907*Math.sin(2*g)
+        - 0.002697*Math.cos(3*g) + 0.00148*Math.sin(3*g);
+    const rad = Math.PI / 180;
+    const hour = ((minutes + correction + 4*66.96 - 300) / 4 - 180) * rad;
+    const lat = 39.65 * rad;
+    const meridian = Math.cos(decl) * Math.cos(hour);
+    return new THREE.Vector3(-Math.cos(decl) * Math.sin(hour),
+        Math.sin(lat)*Math.sin(decl) + Math.cos(lat)*meridian,
+        Math.sin(lat)*meridian - Math.cos(lat)*Math.sin(decl));
 }
 
 // ============================================================
@@ -958,10 +925,25 @@ function animateCamera(targetPos, targetLookAt) {
 // ============================================================
 // TIME OF DAY
 // ============================================================
-function setTimeOfDay(mode) {
-    document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.time-btn').forEach(b => b.classList.toggle('active',b.dataset.time === mode));
-    setupLighting(mode);
+function setTimeOfDay(minutes) {
+    const direction = sunDirection(minutes, siteDate);
+    const daylight = THREE.MathUtils.smoothstep(direction.y, -0.10, 0.20);
+    const highSun = THREE.MathUtils.smoothstep(direction.y, 0, 0.45);
+    directionalLight.position.copy(direction).multiplyScalar(90);
+    directionalLight.visible = directionalLight.castShadow = direction.y > 0;
+    directionalLight.intensity = 1.2 * THREE.MathUtils.smoothstep(direction.y, 0, 0.18);
+    directionalLight.color.setHex(0xff9d64).lerp(new THREE.Color(0xfff8e1), highSun);
+    scene.background.setHex(0x17233b).lerp(new THREE.Color(0xdbad98), daylight)
+        .lerp(new THREE.Color(0xc8d9de), highSun);
+    scene.fog.color.copy(scene.background);
+    ambientLight.intensity = 0.16 + 0.24 * daylight;
+    hemisphereLight.intensity = 0.15 + 0.5 * daylight;
+    windowLights.forEach(light => { light.intensity = 0.8 * (1 - daylight); });
+    const label = [Math.floor(minutes / 60), minutes % 60].map(n => String(n).padStart(2,'0')).join(':');
+    const slider = document.getElementById('site-time');
+    slider.value = minutes;
+    slider.setAttribute('aria-valuetext', label + ' Samarkand time');
+    document.getElementById('time-readout').textContent = label;
 }
 
 // ============================================================

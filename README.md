@@ -35,7 +35,7 @@ python -m http.server 8080
 ## ✨ Features
 
 - **Interactive 3D visualization** built with Three.js (WebGL)
-- **Day / Sunset / Night** lighting modes
+- **Samarkand time slider** for sun position and shadows on the current local date, with Day and Night shortcuts
 - **8 clickable green features** with animated camera focus and detailed stats
 - **OBJ export** — importable into Blender, SketchUp, AutoCAD
 - **Python generator** — programmatic 3D model and specs creation
@@ -126,7 +126,7 @@ MIT License — Free to use, modify, and distribute.
 
 ## Civil / Landscape layer
 
-The interactive viewer now includes a **72 ? 58 m concept plot** (4,176 m?), with north along -Z and east along +X. The existing five-storey building geometry and its lighting modes are retained. Plot dimensions are a design assumption, not a surveyed boundary.
+The interactive viewer now includes a **72 ? 58 m concept plot** (4,176 m?), with north along -Z and east along +X. The existing five-storey building geometry and its site orientation are retained. Plot dimensions are a design assumption, not a surveyed boundary.
 
 - Car-free community courtyard south of the entrance: 8 ? 7 m play area, four benches, shade trees and shared planting.
 - Deciduous south/west trees, mulched low planting and no large lawns.
@@ -141,6 +141,6 @@ For a presentation: start with Site Plan, explain the courtyard and pedestrian r
 
 ### Verification
 
-Run `node verify-site.mjs` from `3d-model/` with Node 18+ and network access, or pass a local Three.js r128 file as its first argument. Checks use actual Three.js geometry/math with stubbed DOM, renderer and orbit input: scene creation, all 16 highlights and restoration, plan/perspective transitions, portrait/landscape camera fitting and three lighting modes. This is not a substitute for browser/WebGL visual inspection.
+Run `node verify-site.mjs` from `3d-model/` with Node 18+ and network access, or pass a local Three.js r128 file as its first argument. Checks use actual Three.js geometry/math with stubbed DOM, renderer and orbit input: scene creation, all 16 highlights and restoration, plan/perspective transitions, portrait/landscape camera fitting and time-dependent sun direction. This is not a substitute for browser/WebGL visual inspection.
 
 Drainage capacity, infiltration, local plant selection, accessible parking dimensions and emergency/service access require site-specific design verification before construction.

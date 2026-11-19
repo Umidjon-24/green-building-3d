@@ -18,10 +18,9 @@ function node() {
 }
 const nodes = new Map();
 const buttons = [...html.matchAll(/highlightFeature\('([^']+)'\)/g)].map(m=>({...node(),dataset:{feature:m[1]}}));
-const timeButtons = ['day','sunset','night'].map(time=>({...node(),dataset:{time}}));
 const context = vm.createContext({console,assert,window:{innerWidth:1280,innerHeight:800,devicePixelRatio:1,addEventListener(){}},
     document:{body:node(),createElement:node,getElementById(id){if(!nodes.has(id))nodes.set(id,node());return nodes.get(id);},
-        querySelectorAll(s){return s==='.feature-btn'?buttons:timeButtons;}},
+        querySelectorAll(s){return s==='.feature-btn'?buttons:[];}},
     requestAnimationFrame(){return 1;},cancelAnimationFrame(){},setTimeout(){}});
 vm.runInContext(three,context);
 vm.runInContext(`
@@ -59,11 +58,20 @@ vm.runInContext(`
             const p=new THREE.Vector3(x,0,z).project(camera);assert(Math.abs(p.x)<1);assert(Math.abs(p.y)<1);
         }
     }
-    for(const mode of ['day','sunset','night']) {setTimeOfDay(mode);assert(scene.children.some(o=>o.isLight));}
+    for (const month of [0, 2, 5, 8, 11]) {
+        const date = new Date(Date.UTC(2026,month,21));
+        const morning = sunDirection(540,date), noon = sunDirection(750,date), afternoon = sunDirection(960,date);
+        assert(morning.x > 0 && afternoon.x < 0 && noon.z > 0);
+        assert(noon.y > morning.y && noon.y > afternoon.y && sunDirection(0,date).y < 0);
+    }
+    setTimeOfDay(540); assert(directionalLight.castShadow && directionalLight.position.x > 0);
+    setTimeOfDay(960); assert(directionalLight.castShadow && directionalLight.position.x < 0);
+    assert.equal(document.getElementById('time-readout').textContent,'16:00');
+    setTimeOfDay(0); assert(!directionalLight.visible && !directionalLight.castShadow);
     showPerspective();assert(camera.isPerspectiveCamera);assert(!planLabels.visible);assert.equal(planMode,false);
     highlightFeature('solar');highlightFeature('parking');closeDetail();
     assert.equal(savedMaterials.size,0);
-    console.log('PASS: scene geometry, 16 highlights twice, material restoration, camera round trip, 3 viewport ratios, 3 lighting modes');
+    console.log('PASS: scene geometry, 16 highlights twice, material restoration, camera round trip, 3 viewport ratios, Samarkand sun path and time control');
 `,context);
 assert(html.indexOf('civil-site.js')<html.indexOf('src="building.js"'));
 assert.equal(buttons.length,16);

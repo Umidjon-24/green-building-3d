@@ -173,10 +173,11 @@
             color: #b0bec5;
             transition: all 0.3s;
         }
-        .time-btn.active {
-            background: rgba(76, 175, 80, 0.3);
-            color: #fff;
-        }
+        #time-toggle { align-items: center; color: #fff; padding-inline: 8px; }
+        #time-toggle label { font-size: 12px; }
+        #time-toggle output { font-variant-numeric: tabular-nums; font-size: 14px; }
+        #site-time { width: clamp(65px, 12vw, 150px); accent-color: #81c784; }
+        .time-btn:hover { background: #315744; }
 
         /* Loading screen */
         #loading {
@@ -259,9 +260,11 @@
 
         <!-- Day/Night Toggle -->
         <div id="time-toggle">
-            <button class="time-btn active" onclick="setTimeOfDay('day')">☀️ Day</button>
-            <button class="time-btn" onclick="setTimeOfDay('sunset')">🌅 Sunset</button>
-            <button class="time-btn" onclick="setTimeOfDay('night')">🌙 Night</button>
+            <button class="time-btn" onclick="setTimeOfDay(720)">Day</button>
+            <label for="site-time">Samarkand time</label>
+            <input id="site-time" type="range" min="0" max="1439" step="1" value="720" oninput="setTimeOfDay(this.valueAsNumber)">
+            <output id="time-readout" for="site-time">12:00</output>
+            <button class="time-btn" onclick="setTimeOfDay(0)">Night</button>
         </div>
 
         <!-- Controls -->
@@ -344,9 +347,7 @@
         document.querySelectorAll('.feature-btn').forEach(b => {
             b.dataset.feature = b.getAttribute('onclick').match(/'([^']+)'/)[1];
         });
-        document.querySelectorAll('.time-btn').forEach(b => {
-            b.dataset.time = b.getAttribute('onclick').match(/'([^']+)'/)[1];
-        });
+
     </script>
     <script src="civil-site.js"></script>
     <script src="building.js"></script>
