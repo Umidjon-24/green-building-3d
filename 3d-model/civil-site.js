@@ -11,7 +11,7 @@ const civilFeatures = {
     community: { title: 'Courtyard Community Space', desc: 'A car-free courtyard beside the entrance combines play, shaded benches and shared planting. Durable, simple equipment and communal space provide everyday amenities at low cost per household.', stats: [['Location', 'South of entrance'], ['Play area', '8 × 7 m'], ['Seating', '4 benches']] },
     trees: { title: 'Shade Trees', desc: 'Deciduous trees on the south and west shade paths and lower façades in summer, then admit more sunlight after leaf fall. Locally suitable species and mulched tree pits reduce maintenance and irrigation demand.', stats: [['Strategy', 'South + west shade'], ['Planting', 'Deciduous canopy'], ['Ground layer', 'Low shrubs + mulch']] },
     paving: { title: 'Permeable Paving', desc: 'Open-jointed pavers over a draining aggregate base allow rain to soak into paths and parking rather than run straight to drains. Modular units can be lifted and reused for repairs, reducing replacement costs.', stats: [['Surfaces', 'Paths, plaza, parking'], ['Finish', 'Open-jointed pavers'], ['Design check', 'Soil / infiltration test']] },
-    raingarden: { title: 'Rain Garden', desc: 'A shallow planted swale beside parking receives surface runoff and cistern overflow, while stored rainwater feeds courtyard drip irrigation. Simple planted drainage reduces demand on pipes and potable water; sizing depends on rainfall and soil tests.', stats: [['Swale', '18 m planted strip'], ['Blue route', 'Cistern → drip beds'], ['Teal arrows', 'Runoff → rain garden']] },
+    raingarden: { title: 'Rain Garden', desc: 'A shallow planted swale beside parking receives surface runoff and cistern overflow, while a separate greywater treatment tank feeds courtyard drip irrigation. Simple planted drainage reduces demand on pipes and potable water; sizing depends on rainfall and soil tests.', stats: [['Swale', '18 m planted strip'], ['Green route', 'Greywater tank → drip beds'], ['Teal arrows', 'Runoff → rain garden']] },
     access: { title: 'Pedestrian & Bike Access', desc: 'A continuous 2 m path links the street-side bus stop, bicycle racks, entrance plaza and courtyard without passing through parking. Step-free routes and simple cycle stands support inexpensive everyday travel.', stats: [['Main path', '2 m clear width'], ['Bike parking', '6 stands / up to 12 bikes'], ['Street link', 'Bus stop + sidewalk']] },
     parking: { title: 'Parking', desc: 'Six compact parking bays sit at the east edge, separated from play by planting and paths. Shared access and permeable paving limit hard surfaces and construction costs while keeping cars out of the courtyard.', stats: [['Spaces', '6 incl. 1 wider bay'], ['Access', 'East-edge drive'], ['Surface', 'Permeable block paving']] },
     waste: { title: 'Waste & Composting', desc: 'A small screened sorting point at the courtyard edge separates recyclables and residual waste, with a covered compost bin for suitable organic material. Shared collection and using mature compost in planting beds can reduce waste and soil-improvement costs.', stats: [['Sorting', 'Paper · containers · residual'], ['Organics', 'Covered compost bin'], ['Location', 'Courtyard service edge']] }
@@ -226,14 +226,8 @@ function createCivilSite() {
     [12,18,23].forEach(z => {
         const arrow = new THREE.ArrowHelper(new THREE.Vector3(-1,0,0),new THREE.Vector3(24,0.3,z),2,0x167c80,0.5,0.35); rain.add(arrow);
     });
-    // Diagrammatic exposed route: cistern -> valve -> courtyard drip beds.
-    siteLine(rain, [[23,0.85,-3],[20,0.85,-3],[19,0.85,12],[14,0.85,12],[14,0.85,27],[5.8,0.85,27],[5.8,0.85,21]],0x2196f3,0.09);
-    siteLine(rain, [[23,0.6,-3],[25,0.6,-3],[25,0.6,5],[21.9,0.6,5],[21.9,0.6,9]],0x167c80,0.07);
-    [-0.8,0,0.8].forEach(dx => siteLine(rain,[[5.8+dx,0.45,22.3],[5.8+dx,0.45,19.7]],0x2196f3,0.035));
-    // Link the existing corner downspout to the existing cistern.
-    siteLine(rain, [[18.15,0.3,7],[19,0.3,7],[19,0.3,-3],[23,0.3,-3]],0x2196f3,0.07);
-    const valve = new THREE.Mesh(new THREE.TorusGeometry(0.25,0.055,6,12),siteMaterial(0x1565c0));
-    valve.position.set(20,1.1,-3); rain.add(valve);
+    // Excess roof runoff bypasses the reuse pipes and drains to the swale.
+    siteLine(rain, [[23,0.6,-3],[27,0.6,-3],[27,0.6,7],[21.9,0.6,7],[21.9,0.6,9]],0x167c80,0.07);
 
     const waste = siteGroup('waste');
     pavers(waste,-20,24,5,4);

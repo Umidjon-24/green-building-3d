@@ -52,9 +52,9 @@ const featureData = {
     },
     water: {
         title: "💧 Rainwater Harvesting & Greywater Recycling",
-        desc: "A cistern collects roof runoff for non-potable use. Treated greywater supplies landscape irrigation. The cost model assumes the following annual reuse volumes.",
+        desc: "Two separate tanks serve different uses. The blue route carries roof runoff to the rain tank and treated rainwater back to toilets. The green route carries shower and basin water to a treatment tank, then to garden drip lines. The cost model assumes the following annual reuse volumes.",
         stats: [
-            ["Cistern capacity", "15,000 L"],
+            ["Rain tank capacity", "15,000 L"],
             ["Rainwater used", "85 m³/year"],
             ["Greywater used", "250 m³/year"]
         ]
@@ -656,13 +656,25 @@ function createWaterSystem() {
     lid.position.set(BUILDING.width / 2 + 5, 0.8, -3);
     waterSystemGroup.add(lid);
 
-    // Label
-    // Horizontal pipe from building to cistern
-    const hPipeGeo = new THREE.CylinderGeometry(0.06, 0.06, 6, 8);
-    const hPipe = new THREE.Mesh(hPipeGeo, pipeMat);
-    hPipe.position.set(BUILDING.width / 2 + 2.5, 0, -3);
-    hPipe.rotation.z = Math.PI / 2;
-    waterSystemGroup.add(hPipe);
+    groundLabel(waterSystemGroup, 'Rain tank · 15 m³', 23,-3,4.5,0.90);
+
+    // The treatment unit is a separate vessel. Its model dimensions are schematic.
+    const greyTank = new THREE.Mesh(new THREE.BoxGeometry(3.2, 1.6, 2.5), siteMaterial(0x507b53));
+    greyTank.position.set(23, -0.22, 3);
+    greyTank.name = 'Greywater treatment tank';
+    waterSystemGroup.add(greyTank);
+    groundLabel(waterSystemGroup, 'Greywater treatment', 23,3,4.5,0.64);
+
+    const blue = 0x2196f3;
+    const green = 0x438347;
+    // Blue: corner downpipe to cistern, then a dedicated toilet supply back into the building.
+    siteLine(waterSystemGroup, [[18.15,0.28,7],[19,0.28,7],[19,0.28,-4],[23,0.28,-4]],blue,0.08);
+    siteLine(waterSystemGroup, [[23,0.45,-2],[17.8,0.45,-2]],blue,0.09);
+    // Green: separate bathroom drains to treatment, then drip lines in the courtyard.
+    siteLine(waterSystemGroup, [[17.8,0.5,3],[23,0.5,3]],green,0.09);
+    siteLine(waterSystemGroup, [[23,0.4,3],[23,0.4,6],[20,0.4,6],[20,0.4,12],[14,0.4,12],[14,0.4,27],[5.8,0.4,27],[5.8,0.4,22.3]],green,0.09);
+    siteLine(waterSystemGroup, [[5,0.4,22.3],[6.6,0.4,22.3]],green,0.04);
+    [-0.8,0,0.8].forEach(dx => siteLine(waterSystemGroup,[[5.8+dx,0.4,22.3],[5.8+dx,0.4,19.7]],green,0.035));
 
     scene.add(waterSystemGroup);
 }

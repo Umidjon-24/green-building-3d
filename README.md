@@ -132,7 +132,7 @@ The interactive viewer now includes a **72 ? 58 m concept plot** (4,176 m?), wit
 - Deciduous south/west trees, mulched low planting and no large lawns.
 - Connected 2 m pedestrian routes, entrance plaza, six cycle stands and a street-side bus stop.
 - Six permeable parking bays on the east edge, including a wider end bay with a transfer strip; vehicles enter from the street along the east-edge aisle.
-- An 18 m planted rain garden beside parking, runoff arrows, cistern overflow and a blue schematic rainwater-to-drip-irrigation route. The displayed blue pipe is a diagrammatic connection, not a literal above-ground installation detail.
+- An 18 m planted rain garden beside parking, runoff arrows, cistern overflow and two separate reuse tanks. Blue pipes connect the roof, 15 m³ rain tank and toilet supply. Green pipes connect the bathroom drains, greywater treatment tank and courtyard drip lines. The exposed pipes illustrate normally buried connections.
 - A screened waste-sorting and covered compost point at the courtyard service edge.
 
 Use **Site Plan** in the camera controls for a north-up orthographic drawing with labels, boundary dimensions, legend and a metre-based scale bar. Pan and zoom remain available; rotation is locked in plan. **3D View** restores orbit controls. All eight original feature buttons remain, alongside eight civil highlights. Clicking site geometry also opens its feature explanation. Escape closes the explanation and restores materials.
